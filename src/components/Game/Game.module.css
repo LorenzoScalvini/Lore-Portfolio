@@ -152,15 +152,134 @@
 .asrielContainer {
   display: flex;
   justify-content: center;
+  align-items: center;
+  overflow: visible;
+  width: 800px;
+  position: relative;
 }
 
+.asrielWrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 300px;
+}
+
+/* Aura arcobaleno */
+.rainbowAura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, 
+    rgba(255,0,0,0.25) 0%,
+    rgba(255,165,0,0.2) 15%,
+    rgba(255,255,0,0.2) 30%,
+    rgba(0,255,0,0.2) 45%,
+    rgba(0,255,255,0.2) 60%,
+    rgba(0,0,255,0.2) 75%,
+    rgba(255,0,255,0.25) 100%
+  );
+  filter: blur(25px);
+  animation: auraPulse 2s ease-in-out infinite, auraRotate 4s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes auraPulse {
+  0%, 100% { 
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.25);
+  }
+}
+
+@keyframes auraRotate {
+  from { background-position: 0% 0%; }
+  to { background-position: 200% 200%; }
+}
+
+/* Asriel originale - scatti molto lenti e lunghi */
 .asriel {
+  position: absolute;
   width: 300px;
   height: 300px;
   object-fit: contain;
   pointer-events: none;
   image-rendering: pixelated;
-  animation: asrielFloat 3s ease-in-out infinite;
+  z-index: 10;
+  filter: drop-shadow(0 0 15px rgba(255,255,255,0.4));
+  animation: asrielLongSlowShots 6s ease-in-out infinite;
+}
+
+/* Asriel arrabbiato - STESSA VELOCITÀ (6s), solo filtro diverso */
+.asrielIntense {
+  animation: asrielLongSlowShots 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255,100,100,0.7));
+}
+
+/* Cloni arcobaleno - stessa animazione lenta */
+.asrielClone {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  pointer-events: none;
+  image-rendering: pixelated;
+  z-index: 1;
+  opacity: 0.5;
+  filter: drop-shadow(0 0 8px var(--clone-color, #fff));
+  mix-blend-mode: screen;
+  animation: asrielLongSlowShots 6s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  transform: translate(var(--offset-x, 0px), var(--offset-y, 0px));
+}
+
+/* Cloni arrabbiati - STESSA VELOCITÀ */
+.asrielCloneIntense {
+  animation: asrielLongSlowShots 6s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+/* MOVIMENTO: scatti MOLTO LENTI E LUNGHI
+   Ogni scatto dura circa 1.5 secondi, movimento totale 6 secondi */
+@keyframes asrielLongSlowShots {
+  /* Parte dal centro */
+  0% {
+    transform: translateX(0px) translateY(0px);
+  }
+  /* 1° scatto LENTO: va a destra (molto largo) */
+  20% {
+    transform: translateX(180px) translateY(-10px);
+  }
+  /* Torna lentamente al centro */
+  35% {
+    transform: translateX(0px) translateY(0px);
+  }
+  /* 2° scatto LENTO: va a sinistra (molto largo) */
+  55% {
+    transform: translateX(-180px) translateY(10px);
+  }
+  /* Torna lentamente al centro */
+  70% {
+    transform: translateX(0px) translateY(0px);
+  }
+  /* 3° scatto LENTO: va a destra */
+  90% {
+    transform: translateX(180px) translateY(-10px);
+  }
+  /* Torna al centro e rimane */
+  100% {
+    transform: translateX(0px) translateY(0px);
+  }
 }
 
 .box {
@@ -238,7 +357,7 @@
   background-color: transparent;
 }
 
-/* Warning phase: azzurro trasparente — il giocatore ha ancora tempo */
+/* Warning phase: azzurro trasparente */
 .warningZone {
   position: absolute;
   top: 0;
@@ -256,7 +375,7 @@
   100% { background: rgba(80, 180, 255, 0.12); box-shadow: inset 0 0 20px rgba(80, 180, 255, 0.1); }
 }
 
-/* Deadly phase: arcobaleno senza pulse */
+/* Deadly phase: arcobaleno */
 .rainbowZone {
   position: absolute;
   top: 0;
@@ -334,18 +453,6 @@
   to {
     transform: translate(-50%, -50%) scale(1.3);
     text-shadow: 4px 4px 0 #ffffff, 0 0 30px rgba(255, 255, 255, 0.5);
-  }
-}
-
-@keyframes asrielFloat {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-  100% {
-    transform: translateY(0px);
   }
 }
 

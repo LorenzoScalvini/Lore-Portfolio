@@ -229,6 +229,18 @@ export default function Game() {
     direction: 1,
   })
 
+  // Stato per i cloni arcobaleno di Asriel
+  const [rainbowClones] = useState(() => {
+    const colors = ['#ff0000', '#ff7700', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#8b00ff']
+    return colors.map((color, index) => ({
+      id: index,
+      color: color,
+      offsetX: (index + 1) * 12,
+      offsetY: Math.sin(index) * 5,
+      delay: index * 0.1,
+    }))
+  })
+
   const keys = useRef({ w: false, a: false, s: false, d: false })
   const intervalRef = useRef(null)
   const attackCycleRef = useRef(null)
@@ -531,7 +543,6 @@ export default function Game() {
     setCountdown(3)
     setGameState("countdown")
     
-    // Avvia l'OST esattamente quando il countdown inizia
     if (ostRef.current) {
       ostRef.current.currentTime = 0
       ostRef.current.volume = 0.5
@@ -571,7 +582,6 @@ export default function Game() {
       
       ostRef.current.addEventListener('ended', handleOstEnd)
       
-      // Avvia gli attacchi SOLO quando il gioco entra in "fight"
       if (gameState === "fight" && !fightStartedRef.current) {
         fightStartedRef.current = true
         startFlameAttackCycle()
@@ -727,11 +737,35 @@ export default function Game() {
         <div className={styles.gameWrapper}>
           <div className={styles.verticalLayout}>
             <div className={styles.asrielContainer}>
-              <img 
-                src={rainbowZoneDeadly ? asrielAngryGif : asrielPng} 
-                alt="Asriel" 
-                className={styles.asriel} 
-              />
+              <div className={styles.asrielWrapper}>
+                {/* Aura arcobaleno */}
+                <div className={styles.rainbowAura}></div>
+                
+                {/* Cloni arcobaleno */}
+                {rainbowClones.map((clone) => (
+                  <img
+                    key={clone.id}
+                    src={rainbowZoneDeadly ? asrielAngryGif : asrielPng}
+                    alt=""
+                    className={`${styles.asrielClone} ${rainbowZoneDeadly ? styles.asrielCloneIntense : ""}`}
+                    style={{
+                      '--clone-color': clone.color,
+                      '--offset-x': `${clone.offsetX}px`,
+                      '--offset-y': `${clone.offsetY}px`,
+                      '--delay': `${clone.delay}s`,
+                    }}
+                    draggable={false}
+                  />
+                ))}
+                
+                {/* Asriel originale */}
+                <img 
+                  src={rainbowZoneDeadly ? asrielAngryGif : asrielPng} 
+                  alt="Asriel" 
+                  className={`${styles.asriel} ${rainbowZoneDeadly ? styles.asrielIntense : ""}`}
+                  draggable={false}
+                />
+              </div>
             </div>
 
             <div className={styles.box}>
