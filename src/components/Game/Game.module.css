@@ -1,7 +1,5 @@
-/* Game.module.css */
 @import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
 
-/* Contenitore principale con effetti CRT */
 .container {
   font-family: "VT323", monospace;
   position: relative;
@@ -18,7 +16,6 @@
   image-rendering: pixelated;
 }
 
-/* Effetto scanline CRT */
 .container::after {
   content: "";
   position: absolute;
@@ -33,7 +30,6 @@
   z-index: 100;
 }
 
-/* Bagliore radiale animato stile Undertale */
 .container::before {
   content: "";
   position: absolute;
@@ -47,70 +43,6 @@
   pointer-events: none;
 }
 
-/* Contenitore video introduttivo - centrato con bordo estetico e più piccolo */
-.videoContainer {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: auto;
-  height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-  background-color: rgba(0, 0, 0, 0.95);
-  box-sizing: border-box;
-  padding: 15px;
-  border: 6px solid #ffffff;
-  box-shadow: 0 0 0 3px #000, 0 0 0 6px #fff, 0 0 20px rgba(255, 255, 255, 0.3);
-  animation: videoContainerGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes videoContainerGlow {
-  from {
-    box-shadow: 0 0 0 3px #000, 0 0 0 6px #fff, 0 0 15px rgba(255, 255, 255, 0.3);
-  }
-  to {
-    box-shadow: 0 0 0 3px #000, 0 0 0 6px #fff, 0 0 30px rgba(255, 255, 255, 0.5);
-  }
-}
-
-.videoPlayer {
-  width: 560px;
-  max-width: 70vw;
-  max-height: 70vh;
-  object-fit: contain;
-  image-rendering: pixelated;
-  display: block;
-}
-
-.skipButton {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 0.8rem 1.5rem;
-  font-size: 1.2rem;
-  color: #fff;
-  background-color: #000;
-  border: 3px solid #fff;
-  cursor: pointer;
-  font-family: inherit;
-  text-transform: uppercase;
-  z-index: 22;
-  transition: all 0.2s ease;
-}
-
-.skipButton:hover {
-  background-color: #fff;
-  color: #000;
-}
-
-.skipButton:active {
-  animation: pixelPress 0.1s;
-}
-
-/* Menu principale e retry */
 .menu,
 .retryMenu {
   position: absolute;
@@ -126,26 +58,6 @@
   box-sizing: border-box;
 }
 
-/* Start Image styling */
-.startImage {
-  width: 280px;
-  height: auto;
-  image-rendering: pixelated;
-  margin-bottom: 1rem;
-  animation: startImageFloat 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
-}
-
-@keyframes startImageFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Container for menu buttons */
 .menuButtons {
   display: flex;
   flex-direction: column;
@@ -179,7 +91,6 @@
   animation: pixelPress 0.1s;
 }
 
-/* Home button styling */
 .homeButton {
   position: relative;
   background-color: #000000;
@@ -211,15 +122,6 @@
   transform: translateY(0);
 }
 
-.homeIcon {
-  font-size: 1.5rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  object-fit: contain;
-  image-rendering: pixelated;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
-}
-
 .retryText {
   font-size: 3rem;
   color: red;
@@ -230,12 +132,6 @@
   letter-spacing: 2px;
 }
 
-/* Nascondi il testo dei controlli WASD */
-.controlsHint {
-  display: none;
-}
-
-/* Vertical layout per Asriel, testo, arena */
 .verticalLayout {
   display: flex;
   flex-direction: column;
@@ -245,7 +141,6 @@
   z-index: 10;
 }
 
-/* Layout di combattimento wrapper */
 .gameWrapper {
   display: flex;
   flex-direction: column;
@@ -254,70 +149,20 @@
   z-index: 10;
 }
 
-/* Asriel container per movimento orizzontale e verticale - attivo anche durante countdown */
 .asrielContainer {
   display: flex;
   justify-content: center;
-  transition: transform 0.03s linear;
-  will-change: transform;
 }
 
-/* Asriel senza bordi */
 .asriel {
   width: 300px;
   height: 300px;
   object-fit: contain;
   pointer-events: none;
   image-rendering: pixelated;
-  animation: pastel-glow 2s linear infinite;
-  filter: drop-shadow(0 0 15px #ffb3ba);
+  animation: asrielFloat 3s ease-in-out infinite;
 }
 
-/* Asriel arrabbiato */
-.asrielAngry {
-  width: 300px;
-  height: 300px;
-  object-fit: contain;
-  pointer-events: none;
-  image-rendering: pixelated;
-  animation: angryGlow 0.8s ease-in-out infinite alternate;
-  filter: drop-shadow(0 0 15px #ff4444);
-}
-
-@keyframes angryGlow {
-  from {
-    filter: drop-shadow(0 0 10px #ff0000);
-  }
-  to {
-    filter: drop-shadow(0 0 25px #ff6666);
-  }
-}
-
-@keyframes pastel-glow {
-  0% {
-    filter: drop-shadow(0 0 15px #ffb3ba);
-  }
-  16% {
-    filter: drop-shadow(0 0 15px #ffdfba);
-  }
-  33% {
-    filter: drop-shadow(0 0 15px #ffffba);
-  }
-  50% {
-    filter: drop-shadow(0 0 15px #baffc9);
-  }
-  66% {
-    filter: drop-shadow(0 0 15px #bae1ff);
-  }
-  83% {
-    filter: drop-shadow(0 0 15px #d4baff);
-  }
-  100% {
-    filter: drop-shadow(0 0 15px #ffb3ba);
-  }
-}
-
-/* Area di gioco */
 .box {
   position: relative;
   width: 280px;
@@ -325,20 +170,8 @@
   border: 8px solid white;
   overflow: hidden;
   background-color: #000;
-  box-shadow: 0 0 0 4px #000, 0 0 0 8px #fff;
-  animation: floaty 3s ease-in-out infinite;
 }
 
-@keyframes floaty {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Cuore giocatore */
 .heart {
   position: absolute;
   width: 24px;
@@ -350,7 +183,6 @@
   filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
 }
 
-/* Fiamme e stelle */
 .flame {
   position: absolute;
   width: 32px;
@@ -364,24 +196,13 @@
 }
 
 @keyframes flame-wiggle {
-  0% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(3deg);
-  }
-  50% {
-    transform: rotate(0deg);
-  }
-  75% {
-    transform: rotate(-3deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(3deg); }
+  50%  { transform: rotate(0deg); }
+  75%  { transform: rotate(-3deg); }
+  100% { transform: rotate(0deg); }
 }
 
-/* Attacco centrale */
 .midAttack {
   width: 80px;
   height: 80px;
@@ -395,33 +216,20 @@
 }
 
 @keyframes midAttackGlow {
-  from {
-    filter: brightness(1) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
-  }
-  to {
-    filter: brightness(1.3) drop-shadow(0 0 12px rgba(255, 215, 0, 1));
-  }
+  from { filter: brightness(1)   drop-shadow(0 0  8px rgba(255, 215, 0, 0.8)); }
+  to   { filter: brightness(1.3) drop-shadow(0 0 12px rgba(255, 215, 0, 1)); }
 }
 
 @keyframes verticalFloat {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
 }
 
 @keyframes slowSpin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* Safe zone - completamente nera come sfondo */
 .safeZone {
   position: absolute;
   top: 0;
@@ -430,12 +238,30 @@
   background-color: transparent;
 }
 
-/* Rainbow zone pastel */
+/* Warning phase: azzurro trasparente — il giocatore ha ancora tempo */
+.warningZone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(80, 180, 255, 0.18);
+  border: 2px solid rgba(120, 200, 255, 0.5);
+  z-index: 1;
+  animation: warningZonePulse 0.9s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+@keyframes warningZonePulse {
+  0%   { background: rgba(80, 180, 255, 0.12); box-shadow: inset 0 0 20px rgba(80, 180, 255, 0.1); }
+  50%  { background: rgba(80, 180, 255, 0.28); box-shadow: inset 0 0 35px rgba(120, 210, 255, 0.25); }
+  100% { background: rgba(80, 180, 255, 0.12); box-shadow: inset 0 0 20px rgba(80, 180, 255, 0.1); }
+}
+
+/* Deadly phase: arcobaleno senza pulse */
 .rainbowZone {
   position: absolute;
   top: 0;
   height: 100%;
-  background: linear-gradient(135deg, 
+  background: linear-gradient(135deg,
     #ffb3ba, #ffd4a8, #fff5ba, #baffc9, #bae1ff, #d4baff, #f5baff, #ffb3ba);
   background-size: 200% 200%;
   animation: rainbowGradient 2s ease infinite;
@@ -444,431 +270,11 @@
   opacity: 1;
 }
 
-.rainbowZone.deadly {
-  animation: rainbowPulse 0.5s ease-in-out infinite alternate;
-  opacity: 1;
-}
-
 @keyframes rainbowGradient {
-  0% {
-    background-position: 0% 0%;
-  }
-  100% {
-    background-position: 100% 100%;
-  }
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
 }
 
-@keyframes rainbowPulse {
-  from {
-    background: linear-gradient(135deg, #ffb3ba, #ffd4a8, #fff5ba, #baffc9, #bae1ff, #d4baff, #f5baff);
-    background-size: 200% 200%;
-  }
-  to {
-    background: linear-gradient(135deg, #ffd4a8, #fff5ba, #baffc9, #bae1ff, #d4baff, #f5baff, #ffb3ba);
-    background-size: 200% 200%;
-  }
-}
-
-.zoneCountdown {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 4rem;
-  font-weight: bold;
-  color: white;
-  text-shadow: 3px 3px 0 #000;
-  z-index: 2;
-}
-
-/* Countdown generale */
-.countdownText {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 5rem;
-  font-weight: bold;
-  color: #ffffff;
-  text-shadow: 3px 3px 0 #000;
-  z-index: 200;
-  animation: countdownPulse 0.5s ease-in-out;
-}
-
-@keyframes countdownPulse {
-  0% {
-    transform: translate(-50%, -50%) scale(0.5);
-    opacity: 0;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-}
-
-/* Warning circles per attacco circolare */
-.circleWarning {
-  position: absolute;
-  border: 3px dashed rgba(126, 126, 126, 0.6);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 15;
-  animation: warningPulse 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes warningPulse {
-  from {
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: scale(0.9);
-  }
-  to {
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.1);
-  }
-}
-
-/* Effetto pressione pixel art */
-@keyframes pixelPress {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(2px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-/* Speedrun Timer - NASCOSTO */
-.speedrunTimer {
-  display: none;
-}
-
-/* Attack Name Display - Smaller text */
-.attackNameDisplay {
-  font-size: 1.2rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  margin: 0.3rem 0;
-  z-index: 10;
-  text-align: center;
-}
-
-/* Flame Attack Name */
-.flameAttackName {
-  color: #ff9f7c;
-  text-shadow: 2px 2px 0 #000;
-  animation: flameGlow 0.3s ease-in-out infinite alternate;
-}
-
-@keyframes flameGlow {
-  from {
-    text-shadow: 2px 2px 0 #000;
-  }
-  to {
-    text-shadow: 2px 2px 0 #000, 0 0 15px rgba(255, 159, 124, 0.6);
-  }
-}
-
-/* Transition Attack Name */
-.transitionAttackName {
-  color: #c9a0dc;
-  text-shadow: 2px 2px 0 #000;
-  animation: transitionGlow 0.8s ease-in-out infinite alternate;
-}
-
-@keyframes transitionGlow {
-  from {
-    text-shadow: 2px 2px 0 #000;
-  }
-  to {
-    text-shadow: 2px 2px 0 #000, 0 0 15px rgba(201, 160, 220, 0.6);
-  }
-}
-
-/* Special Attack Name */
-.specialAttackName {
-  color: #ff99bb;
-  text-shadow: 2px 2px 0 #000;
-  animation: specialGlow 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes specialGlow {
-  from {
-    text-shadow: 2px 2px 0 #000;
-    color: #ff99bb;
-  }
-  to {
-    text-shadow: 2px 2px 0 #000, 0 0 15px rgba(255, 153, 187, 0.6);
-    color: #ffbbcc;
-  }
-}
-
-/* Survival Time Result on Death Screen */
-.survivalTimeResult {
-  font-size: 2rem;
-  color: #ffd700;
-  text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  letter-spacing: 2px;
-  margin-bottom: 1.5rem;
-  animation: resultGlow 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes resultGlow {
-  from {
-    text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  }
-  to {
-    text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 20px rgba(255, 215, 0, 0.8);
-  }
-}
-
-/* Asriel Dialogue Box - consistent size */
-.asrielDialogue {
-  background-color: rgba(0, 0, 0, 0.9);
-  border: 4px solid #ffffff;
-  padding: 0.8rem 1.5rem;
-  min-width: 380px;
-  max-width: 500px;
-  width: auto;
-  min-height: 85px;
-  text-align: center;
-  z-index: 60;
-  animation: dialogueGlow 2s ease-in-out infinite alternate;
-  box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff;
-  backdrop-filter: blur(2px);
-  margin: 0.5rem 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-@keyframes dialogueGlow {
-  from {
-    box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff;
-  }
-  to {
-    box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff, 0 0 20px rgba(255, 255, 255, 0.5);
-  }
-}
-
-.asrielName {
-  display: block;
-  font-size: 1rem;
-  color: #ffcc00;
-  text-shadow: 2px 2px 0 #000;
-  letter-spacing: 2px;
-  margin-bottom: 0.3rem;
-  font-weight: bold;
-}
-
-.dialogueText {
-  display: block;
-  font-size: 1.1rem;
-  color: #ffffff;
-  text-shadow: 2px 2px 0 #000;
-  letter-spacing: 1px;
-  font-style: italic;
-  animation: textFade 0.5s ease-in-out;
-}
-
-@keyframes textFade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Design responsive */
-@media (max-width: 768px) {
-  .container {
-    padding: 0;
-  }
-
-  .videoContainer {
-    padding: 12px;
-  }
-
-  .videoPlayer {
-    width: 420px;
-    max-width: 75vw;
-    max-height: 65vh;
-  }
-
-  .skipButton {
-    top: 10px;
-    right: 10px;
-    padding: 0.6rem 1rem;
-    font-size: 1rem;
-  }
-
-  .box {
-    width: 240px;
-    height: 240px;
-  }
-
-  .asriel,
-  .asrielAngry {
-    width: 220px;
-    height: 220px;
-  }
-
-  .startImage {
-    width: 220px;
-  }
-
-  .menuButton,
-  .homeButton {
-    font-size: 1.2rem;
-    padding: 0.8rem 1.5rem;
-  }
-
-  .menuButtons {
-    gap: 1rem;
-  }
-
-  .attackNameDisplay {
-    font-size: 1rem;
-  }
-
-  .survivalTimeResult {
-    font-size: 1.5rem;
-  }
-
-  .asrielDialogue {
-    padding: 0.6rem 1.2rem;
-    min-width: 300px;
-    max-width: 90%;
-    min-height: 75px;
-  }
-  
-  .asrielName {
-    font-size: 0.9rem;
-  }
-  
-  .dialogueText {
-    font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .videoContainer {
-    padding: 8px;
-  }
-
-  .videoPlayer {
-    width: 300px;
-    max-width: 85vw;
-    max-height: 60vh;
-  }
-
-  .skipButton {
-    top: 5px;
-    right: 5px;
-    padding: 0.5rem 0.8rem;
-    font-size: 0.9rem;
-  }
-
-  .box {
-    width: 200px;
-    height: 200px;
-  }
-
-  .asriel,
-  .asrielAngry {
-    width: 180px;
-    height: 180px;
-  }
-
-  .startImage {
-    width: 180px;
-  }
-
-  .menuButton,
-  .homeButton {
-    font-size: 1rem;
-    padding: 0.6rem 1.2rem;
-  }
-
-  .retryText {
-    font-size: 2rem;
-    padding: 0 20px;
-    text-align: center;
-  }
-
-  .countdownText,
-  .zoneCountdown {
-    font-size: 3rem;
-  }
-
-  .menuButtons {
-    gap: 0.8rem;
-  }
-
-  .homeIcon {
-    font-size: 1.2rem;
-  }
-
-  .attackNameDisplay {
-    font-size: 0.9rem;
-    letter-spacing: 2px;
-  }
-
-  .survivalTimeResult {
-    font-size: 1.2rem;
-  }
-
-  .asrielDialogue {
-    padding: 0.5rem 1rem;
-    min-width: 260px;
-    min-height: 70px;
-  }
-  
-  .asrielName {
-    font-size: 0.8rem;
-  }
-  
-  .dialogueText {
-    font-size: 0.85rem;
-  }
-}
-
-/* Blue warning zone - più scura per contrasto */
-.warningZone {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  background: linear-gradient(135deg, #1e3a5f, #2a4a6e, #1e3a5f);
-  background-size: 200% 200%;
-  animation: warningZonePulse 0.8s ease infinite;
-  z-index: 1;
-  transition: all 0.3s ease;
-  opacity: 1;
-}
-
-@keyframes warningZonePulse {
-  0% {
-    background-position: 0% 0%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-  100% {
-    background-position: 0% 0%;
-  }
-}
-
-/* Countdown numbers styling */
 .zoneCountdown {
   position: absolute;
   top: 50%;
@@ -883,20 +289,30 @@
 }
 
 @keyframes countdownNumberPulse {
-  0% {
-    transform: translate(-50%, -50%) scale(0.5);
-    opacity: 0;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.3);
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
+  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  50%  { transform: translate(-50%, -50%) scale(1.3); }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-/* Exclamation mark for deadly zone - nero */
+.countdownText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 3px 3px 0 #000;
+  z-index: 200;
+  animation: countdownPulse 0.5s ease-in-out;
+}
+
+@keyframes countdownPulse {
+  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  50%  { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
 .zoneDeadlyExclamation {
   position: absolute;
   top: 50%;
@@ -919,4 +335,89 @@
     transform: translate(-50%, -50%) scale(1.3);
     text-shadow: 4px 4px 0 #ffffff, 0 0 30px rgba(255, 255, 255, 0.5);
   }
+}
+
+@keyframes asrielFloat {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes pixelPress {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+/* STATS BAR - Stile Undertale */
+.statsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 280px;
+  padding: 6px 12px;
+  font-family: "VT323", monospace;
+  image-rendering: pixelated;
+  box-sizing: border-box;
+}
+
+.statsLeft {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.statsRight {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.statText {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: none;
+}
+
+.statValue {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.hpBarContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.hpBarRed {
+  width: 60px;
+  height: 10px;
+  background-color: #ff0000;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.hpBarYellow {
+  width: 16px;
+  height: 10px;
+  background-color: #ffff00;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-right: 1px solid #ccaa00;
+}
+
+.hpText {
+  color: #ffffff;
+  font-size: 24px;
 }

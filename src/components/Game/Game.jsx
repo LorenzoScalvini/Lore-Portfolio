@@ -1,240 +1,212 @@
-// Game.jsx
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import styles from "./Game.module.css"
 
-// Asset imports
 import ostAudio from "../../assets/game/ost.mp3"
 import deathAudio from "../../assets/game/death.mp3"
 import dangerAudio from "../../assets/game/danger.mp3"
 import attackAudio from "../../assets/game/attack.mp3"
 import flamecastAudio from "../../assets/game/flamecast.mp3"
-import victoryAudio from "../../assets/game/victory.mp3"
-import startVideo from "../../assets/game/start.mp4"
-import asrielAngryGif from "../../assets/game/asriel-angry.gif"
 import asrielPng from "../../assets/game/asriel.png"
+import asrielAngryGif from "../../assets/game/asriel-angry.gif"
 import heartImage from "../../assets/game/heart.png"
-import startImage from "../../assets/game/start.png"
 import flamesImage from "../../assets/game/flames.png"
-import starsImage from "../../assets/game/stars.png"
 import midImage from "../../assets/game/mid.png"
-import midImage2 from "../../assets/game/mid2.png"
-import winImage from "../../assets/game/win.png"
 
-// Asriel voice audio imports
-import asrielTalk1 from "../../assets/game/asrieltalk1.mp3"
-import asrielTalk2 from "../../assets/game/asrieltalk2.mp3"
-import asrielTalk3 from "../../assets/game/asrieltalk3.mp3"
-
-// GAME CONFIGURATION CONSTANTS
 const GAME_CONFIG = {
-  FLAME_SIZE: 24,
+  FLAME_SIZE: 32,
   HEART_SIZE: 24,
   BOX_SIZE: 280,
   MID_ATTACK_WIDTH: 80,
   MID_ATTACK_HEIGHT: 80,
-  FLAME_ATTACK_DURATION: 12000,
+  FLAME_ATTACK_DURATION: 9000,
   SPECIAL_ATTACK_DURATION: 6000,
-  TRANSITION_DURATION: 2000,
-  ASRIEL_ANGRY_DURATION: 1500,
+  TRANSITION_DURATION: 1000,
   DANGER_ZONE_WARNING_DURATION: 3500,
   DANGER_ZONE_ACTIVE_DURATION: 5000,
 }
 
-// ASRIEL DIALOGUE LINES - 10 lines in English
-const asrielLines = [
-  "You're determined... but not enough!",
-  "The fate of all monsters rests on my shoulders!",
-  "Your SOUL will burn like an blazing fire!",
-  "Show me what you've got, little human!",
-  "I cannot afford to lose!",
-  "The weight of my actions crushes me...",
-  "Every monster is counting on me!",
-  "The barrier must fall!",
-  "Your DETERMINATION is admirable!",
-  "Give me everything you've got!",
-]
+const horizontalAttack = {
+  name: "horizontal",
+  getForward: () => [
+    { id: 1, x: -80, y: 60, dx: 2.0, dy: 0 },
+    { id: 2, x: GAME_CONFIG.BOX_SIZE + 80, y: 120, dx: -2.3, dy: 0 },
+    { id: 3, x: -100, y: 180, dx: 1.8, dy: 0 },
+    { id: 4, x: GAME_CONFIG.BOX_SIZE + 100, y: 240, dx: -2.1, dy: 0 },
+    { id: 5, x: -60, y: 30, dx: 2.5, dy: 0 },
+    { id: 6, x: GAME_CONFIG.BOX_SIZE + 60, y: 90, dx: -2.7, dy: 0 },
+  ],
+  getInverted: () => [
+    { id: 1, x: GAME_CONFIG.BOX_SIZE + 80, y: 220, dx: -2.0, dy: 0 },
+    { id: 2, x: -80, y: 160, dx: 2.3, dy: 0 },
+    { id: 3, x: GAME_CONFIG.BOX_SIZE + 100, y: 100, dx: -1.8, dy: 0 },
+    { id: 4, x: -100, y: 40, dx: 2.1, dy: 0 },
+    { id: 5, x: GAME_CONFIG.BOX_SIZE + 60, y: 250, dx: -2.5, dy: 0 },
+    { id: 6, x: -60, y: 190, dx: 2.7, dy: 0 },
+  ]
+}
 
-// Asriel voice audio array
-const asrielTalkAudios = [asrielTalk1, asrielTalk2, asrielTalk3]
+const verticalAttack = {
+  name: "vertical",
+  getForward: () => [
+    { id: 7, x: 60, y: -80, dx: 0, dy: 2.0 },
+    { id: 8, x: 120, y: GAME_CONFIG.BOX_SIZE + 80, dx: 0, dy: -2.3 },
+    { id: 9, x: 180, y: -100, dx: 0, dy: 1.8 },
+    { id: 10, x: 240, y: GAME_CONFIG.BOX_SIZE + 100, dx: 0, dy: -2.1 },
+    { id: 11, x: 30, y: -60, dx: 0, dy: 2.5 },
+    { id: 12, x: 90, y: GAME_CONFIG.BOX_SIZE + 60, dx: 0, dy: -2.7 },
+  ],
+  getInverted: () => [
+    { id: 7, x: 220, y: GAME_CONFIG.BOX_SIZE + 80, dx: 0, dy: -2.0 },
+    { id: 8, x: 160, y: -80, dx: 0, dy: 2.3 },
+    { id: 9, x: 100, y: GAME_CONFIG.BOX_SIZE + 100, dx: 0, dy: -1.8 },
+    { id: 10, x: 40, y: -100, dx: 0, dy: 2.1 },
+    { id: 11, x: 250, y: GAME_CONFIG.BOX_SIZE + 60, dx: 0, dy: -2.5 },
+    { id: 12, x: 190, y: -60, dx: 0, dy: 2.7 },
+  ]
+}
 
-// FLAME WAVE TYPES
-const flameWaveTypes = ["horizontal", "vertical", "diagonal", "circle_spiral", "circle_burst"]
+const diagonalAttack = {
+  name: "diagonal",
+  getForward: () => [
+    { id: 13, x: -80, y: -80, dx: 1.6, dy: 1.6 },
+    { id: 14, x: GAME_CONFIG.BOX_SIZE + 80, y: GAME_CONFIG.BOX_SIZE + 80, dx: -1.8, dy: -1.8 },
+    { id: 15, x: -100, y: GAME_CONFIG.BOX_SIZE + 100, dx: 2.0, dy: -2.0 },
+    { id: 16, x: GAME_CONFIG.BOX_SIZE + 100, y: -100, dx: -2.2, dy: 2.2 },
+    { id: 17, x: -60, y: -60, dx: 1.4, dy: 1.4 },
+    { id: 18, x: GAME_CONFIG.BOX_SIZE + 60, y: GAME_CONFIG.BOX_SIZE + 60, dx: -1.6, dy: -1.6 },
+  ],
+  getInverted: () => [
+    { id: 13, x: GAME_CONFIG.BOX_SIZE + 80, y: GAME_CONFIG.BOX_SIZE + 80, dx: -1.6, dy: -1.6 },
+    { id: 14, x: -80, y: -80, dx: 1.8, dy: 1.8 },
+    { id: 15, x: GAME_CONFIG.BOX_SIZE + 100, y: -100, dx: -2.0, dy: 2.0 },
+    { id: 16, x: -100, y: GAME_CONFIG.BOX_SIZE + 100, dx: 2.2, dy: -2.2 },
+    { id: 17, x: GAME_CONFIG.BOX_SIZE + 60, y: GAME_CONFIG.BOX_SIZE + 60, dx: -1.4, dy: -1.4 },
+    { id: 18, x: -60, y: -60, dx: 1.6, dy: 1.6 },
+  ]
+}
 
-// CREATE FLAME WAVE PATTERNS - with optional inverted/opposite direction for second cycle
-const createFlameWave = (waveType, isInverted = false) => {
-  const { BOX_SIZE, FLAME_SIZE } = GAME_CONFIG
-  const centerX = BOX_SIZE / 2
-  const centerY = BOX_SIZE / 2
-  
-  // For inverted patterns: reverse directions and flip positions
-  const invertMultiplier = isInverted ? -1 : 1
-  
-  switch (waveType) {
-    case "horizontal":
-      if (!isInverted) {
-        // Normal horizontal pattern
-        return [
-          { id: 1, x: -80, y: 60, dx: 2.0, dy: 0 },
-          { id: 2, x: BOX_SIZE + 80, y: 120, dx: -2.3, dy: 0 },
-          { id: 3, x: -100, y: 180, dx: 1.8, dy: 0 },
-          { id: 4, x: BOX_SIZE + 100, y: 240, dx: -2.1, dy: 0 },
-          { id: 5, x: -60, y: 30, dx: 2.5, dy: 0 },
-          { id: 6, x: BOX_SIZE + 60, y: 90, dx: -2.7, dy: 0 },
-        ]
-      } else {
-        // Inverted horizontal pattern - different Y positions and reversed directions
-        return [
-          { id: 1, x: BOX_SIZE + 80, y: 220, dx: -2.0, dy: 0 },
-          { id: 2, x: -80, y: 160, dx: 2.3, dy: 0 },
-          { id: 3, x: BOX_SIZE + 100, y: 100, dx: -1.8, dy: 0 },
-          { id: 4, x: -100, y: 40, dx: 2.1, dy: 0 },
-          { id: 5, x: BOX_SIZE + 60, y: 250, dx: -2.5, dy: 0 },
-          { id: 6, x: -60, y: 190, dx: 2.7, dy: 0 },
-        ]
-      }
-    case "vertical":
-      if (!isInverted) {
-        // Normal vertical pattern
-        return [
-          { id: 7, x: 60, y: -80, dx: 0, dy: 2.0 },
-          { id: 8, x: 120, y: BOX_SIZE + 80, dx: 0, dy: -2.3 },
-          { id: 9, x: 180, y: -100, dx: 0, dy: 1.8 },
-          { id: 10, x: 240, y: BOX_SIZE + 100, dx: 0, dy: -2.1 },
-          { id: 11, x: 30, y: -60, dx: 0, dy: 2.5 },
-          { id: 12, x: 90, y: BOX_SIZE + 60, dx: 0, dy: -2.7 },
-        ]
-      } else {
-        // Inverted vertical pattern - different X positions and reversed directions
-        return [
-          { id: 7, x: 220, y: BOX_SIZE + 80, dx: 0, dy: -2.0 },
-          { id: 8, x: 160, y: -80, dx: 0, dy: 2.3 },
-          { id: 9, x: 100, y: BOX_SIZE + 100, dx: 0, dy: -1.8 },
-          { id: 10, x: 40, y: -100, dx: 0, dy: 2.1 },
-          { id: 11, x: 250, y: BOX_SIZE + 60, dx: 0, dy: -2.5 },
-          { id: 12, x: 190, y: -60, dx: 0, dy: 2.7 },
-        ]
-      }
-    case "diagonal":
-      if (!isInverted) {
-        // Normal diagonal pattern
-        return [
-          { id: 13, x: -80, y: -80, dx: 1.6, dy: 1.6 },
-          { id: 14, x: BOX_SIZE + 80, y: BOX_SIZE + 80, dx: -1.8, dy: -1.8 },
-          { id: 15, x: -100, y: BOX_SIZE + 100, dx: 2.0, dy: -2.0 },
-          { id: 16, x: BOX_SIZE + 100, y: -100, dx: -2.2, dy: 2.2 },
-          { id: 17, x: -60, y: -60, dx: 1.4, dy: 1.4 },
-          { id: 18, x: BOX_SIZE + 60, y: BOX_SIZE + 60, dx: -1.6, dy: -1.6 },
-        ]
-      } else {
-        // Inverted diagonal pattern - opposite directions
-        return [
-          { id: 13, x: BOX_SIZE + 80, y: BOX_SIZE + 80, dx: -1.6, dy: -1.6 },
-          { id: 14, x: -80, y: -80, dx: 1.8, dy: 1.8 },
-          { id: 15, x: BOX_SIZE + 100, y: -100, dx: -2.0, dy: 2.0 },
-          { id: 16, x: -100, y: BOX_SIZE + 100, dx: 2.2, dy: -2.2 },
-          { id: 17, x: BOX_SIZE + 60, y: BOX_SIZE + 60, dx: -1.4, dy: -1.4 },
-          { id: 18, x: -60, y: -60, dx: 1.6, dy: 1.6 },
-        ]
-      }
-    case "circle_spiral":
-      if (!isInverted) {
-        // Normal spiral - expanding outward clockwise
-        const spiralFlames = []
-        for (let i = 0; i < 6; i++) {
-          const angle = (i * Math.PI * 2) / 6
-          spiralFlames.push({
-            id: 19 + i,
-            x: centerX - FLAME_SIZE / 2,
-            y: centerY - FLAME_SIZE / 2,
-            dx: Math.cos(angle) * 0.8,
-            dy: Math.sin(angle) * 0.8,
-            isExpanding: true,
-            currentRadius: 0,
-            maxRadius: 140,
-            angle: angle,
-            speed: 1.2,
-          })
-        }
-        return spiralFlames
-      } else {
-        // Inverted spiral - opposite rotation direction (counter-clockwise)
-        const spiralFlames = []
-        for (let i = 0; i < 6; i++) {
-          const angle = -(i * Math.PI * 2) / 6
-          spiralFlames.push({
-            id: 19 + i,
-            x: centerX - FLAME_SIZE / 2,
-            y: centerY - FLAME_SIZE / 2,
-            dx: Math.cos(angle) * -0.8,
-            dy: Math.sin(angle) * -0.8,
-            isExpanding: true,
-            currentRadius: 0,
-            maxRadius: 140,
-            angle: angle,
-            speed: 1.2,
-          })
-        }
-        return spiralFlames
-      }
-    case "circle_burst":
-      if (!isInverted) {
-        // Normal burst - outward in all directions
-        const burstFlames = []
-        for (let i = 0; i < 8; i++) {
-          const angle = (i * Math.PI * 2) / 8
-          const speed = 1.0 + Math.random() * 0.6
-          burstFlames.push({
-            id: 31 + i,
-            x: centerX - FLAME_SIZE / 2,
-            y: centerY - FLAME_SIZE / 2,
-            dx: Math.cos(angle) * speed,
-            dy: Math.sin(angle) * speed,
-            isBurst: true,
-          })
-        }
-        return burstFlames
-      } else {
-        // Inverted burst - inward then outward or different pattern
-        const burstFlames = []
-        for (let i = 0; i < 8; i++) {
-          const angle = (i * Math.PI * 2) / 8 + Math.PI / 8 // Offset angle
-          const speed = 0.8 + Math.random() * 0.5
-          burstFlames.push({
-            id: 31 + i,
-            x: centerX - FLAME_SIZE / 2 + (Math.cos(angle) * 20),
-            y: centerY - FLAME_SIZE / 2 + (Math.sin(angle) * 20),
-            dx: Math.cos(angle) * speed,
-            dy: Math.sin(angle) * speed,
-            isBurst: true,
-          })
-        }
-        return burstFlames
-      }
-    default:
-      return []
+const circleSpiralAttack = {
+  name: "circle_spiral",
+  getForward: () => {
+    const centerX = GAME_CONFIG.BOX_SIZE / 2
+    const centerY = GAME_CONFIG.BOX_SIZE / 2
+    const spiralFlames = []
+    for (let i = 0; i < 6; i++) {
+      const angle = (i * Math.PI * 2) / 6
+      spiralFlames.push({
+        id: 19 + i,
+        x: centerX - GAME_CONFIG.FLAME_SIZE / 2,
+        y: centerY - GAME_CONFIG.FLAME_SIZE / 2,
+        dx: Math.cos(angle) * 0.8,
+        dy: Math.sin(angle) * 0.8,
+        isExpanding: true,
+        currentRadius: 0,
+        maxRadius: 140,
+        angle: angle,
+        speed: 1.2,
+      })
+    }
+    return spiralFlames
+  },
+  getInverted: () => {
+    const centerX = GAME_CONFIG.BOX_SIZE / 2
+    const centerY = GAME_CONFIG.BOX_SIZE / 2
+    const spiralFlames = []
+    for (let i = 0; i < 6; i++) {
+      const angle = -(i * Math.PI * 2) / 6
+      spiralFlames.push({
+        id: 19 + i,
+        x: centerX - GAME_CONFIG.FLAME_SIZE / 2,
+        y: centerY - GAME_CONFIG.FLAME_SIZE / 2,
+        dx: Math.cos(angle) * -0.8,
+        dy: Math.sin(angle) * -0.8,
+        isExpanding: true,
+        currentRadius: 0,
+        maxRadius: 140,
+        angle: angle,
+        speed: 1.2,
+      })
+    }
+    return spiralFlames
   }
 }
 
-// Get random mid attack image
-const getRandomMidImage = () => {
-  const images = [midImage, midImage2]
-  return images[Math.floor(Math.random() * images.length)]
+const midAttackConfig = {
+  width: GAME_CONFIG.MID_ATTACK_WIDTH,
+  height: GAME_CONFIG.MID_ATTACK_HEIGHT,
+  speed: 2.0,
+  getRandomStart: () => {
+    const fromRight = Math.random() > 0.5
+    return {
+      x: fromRight ? GAME_CONFIG.BOX_SIZE : -GAME_CONFIG.MID_ATTACK_WIDTH,
+      y: Math.random() * (GAME_CONFIG.BOX_SIZE - GAME_CONFIG.MID_ATTACK_HEIGHT),
+      direction: fromRight ? -1 : 1,
+    }
+  }
 }
 
-// MAIN ASRIEL COMPONENT
+const allAttacks = [horizontalAttack, verticalAttack, diagonalAttack, circleSpiralAttack]
+const flameWaveTypes = allAttacks.map(attack => attack.name)
+
+const createAttack = (attackName, isInverted = false) => {
+  const attack = allAttacks.find(a => a.name === attackName)
+  if (!attack) return []
+  
+  return isInverted ? attack.getInverted() : attack.getForward()
+}
+
+const moveAttackProjectile = (projectile, attackName) => {
+  let newX = projectile.x
+  let newY = projectile.y
+  const { BOX_SIZE, FLAME_SIZE } = GAME_CONFIG
+  
+  if (attackName === "circle_spiral" && projectile.isExpanding) {
+    if (projectile.currentRadius < projectile.maxRadius) {
+      projectile.currentRadius += projectile.speed
+      const centerX = BOX_SIZE / 2
+      const centerY = BOX_SIZE / 2
+      newX = centerX + Math.cos(projectile.angle) * projectile.currentRadius - FLAME_SIZE / 2
+      newY = centerY + Math.sin(projectile.angle) * projectile.currentRadius - FLAME_SIZE / 2
+    } else {
+      newX = projectile.x + projectile.dx
+      newY = projectile.y + projectile.dy
+    }
+  } else {
+    newX = projectile.x + projectile.dx
+    newY = projectile.y + projectile.dy
+  }
+  
+  if (newX > BOX_SIZE + 100) newX = -100 - FLAME_SIZE
+  if (newX < -100 - FLAME_SIZE) newX = BOX_SIZE + 100
+  if (newY > BOX_SIZE + 100) newY = -100 - FLAME_SIZE
+  if (newY < -100 - FLAME_SIZE) newY = BOX_SIZE + 100
+  
+  return { ...projectile, x: newX, y: newY }
+}
+
+const moveMidAttack = (midAttack) => {
+  let newDirection = midAttack.direction
+  let newX = midAttack.x + midAttack.speed * midAttack.direction
+  
+  if (newX > GAME_CONFIG.BOX_SIZE) {
+    newDirection = -1
+    newX = GAME_CONFIG.BOX_SIZE
+  } else if (newX < -GAME_CONFIG.MID_ATTACK_WIDTH) {
+    newDirection = 1
+    newX = -GAME_CONFIG.MID_ATTACK_WIDTH
+  }
+  
+  return { ...midAttack, x: newX, direction: newDirection }
+}
+
 export default function Game() {
   const navigate = useNavigate()
 
-  // Main game states
   const [gameState, setGameState] = useState("loading")
   const [position, setPosition] = useState({ x: 128, y: 128 })
   const [countdown, setCountdown] = useState(3)
 
-  // Intro video state
-  const [showVideo, setShowVideo] = useState(false)
-
-  // Rainbow zone attack states
   const [zoneActive, setZoneActive] = useState(false)
   const [zoneCountdown, setZoneCountdown] = useState(3)
   const [zoneCountdownDisplay, setZoneCountdownDisplay] = useState(3)
@@ -242,17 +214,13 @@ export default function Game() {
   const [rainbowZoneDeadly, setRainbowZoneDeadly] = useState(false)
   const [isZoneWarning, setIsZoneWarning] = useState(true)
 
-  // Attack phase states
   const [attackPhase, setAttackPhase] = useState("transition")
-  const [attackCountdown, setAttackCountdown] = useState(GAME_CONFIG.FLAME_ATTACK_DURATION / 1000)
   const [flameCycleCount, setFlameCycleCount] = useState(0)
   const [isSecondCycle, setIsSecondCycle] = useState(false)
 
-  // Projectile states
   const [visibleFlames, setVisibleFlames] = useState([])
   const [currentFlameWave, setCurrentFlameWave] = useState(0)
 
-  // Mid attack states
   const [midAttack, setMidAttack] = useState({
     active: false,
     x: -GAME_CONFIG.MID_ATTACK_WIDTH,
@@ -260,27 +228,9 @@ export default function Game() {
     speed: 1.5,
     direction: 1,
   })
-  const [currentMidImage, setCurrentMidImage] = useState(midImage)
 
-  // Asriel visual states
-  const [showAngryAsriel, setShowAngryAsriel] = useState(false)
-  const [showWarningAsriel, setShowWarningAsriel] = useState(false)
-
-  // Victory and dialogue states
-  const [currentAsrielLine, setCurrentAsrielLine] = useState("")
-  const [showAsrielDialogue, setShowAsrielDialogue] = useState(true)
-
-  // Asriel position for horizontal AND vertical movement
-  const [asrielOffsetX, setAsrielOffsetX] = useState(0)
-  const [asrielOffsetY, setAsrielOffsetY] = useState(0)
-  const asrielDirectionXRef = useRef(1)
-  const asrielDirectionYRef = useRef(1)
-
-  // Refs for input and timers
   const keys = useRef({ w: false, a: false, s: false, d: false })
   const intervalRef = useRef(null)
-  const angryAsrielTimeoutRef = useRef(null)
-  const warningAsrielTimeoutRef = useRef(null)
   const attackCycleRef = useRef(null)
   const specialAttackCycleRef = useRef(null)
   const countdownIntervalRef = useRef(null)
@@ -288,22 +238,17 @@ export default function Game() {
   const midAttackMoveIntervalRef = useRef(null)
   const rainbowZoneTimeoutRef = useRef(null)
   const rainbowZoneCountdownRef = useRef(null)
-  const asrielDialogueIntervalRef = useRef(null)
   const flameAttackTimeoutRef = useRef(null)
-  const asrielMoveIntervalRef = useRef(null)
   const zoneCountdownIntervalRef = useRef(null)
+  const ostEndedRef = useRef(false)
+  const fightStartedRef = useRef(false)
 
-  // Audio refs
   const ostRef = useRef(null)
   const deathRef = useRef(null)
   const dangerRef = useRef(null)
   const attackRef = useRef(null)
   const flamecastRef = useRef(null)
-  const victoryAudioRef = useRef(null)
-  const videoRef = useRef(null)
-  const asrielTalkRefs = useRef([null, null, null])
 
-  // Play flamecast audio when flame wave starts
   const playFlamecast = () => {
     if (flamecastRef.current) {
       flamecastRef.current.currentTime = 0
@@ -311,81 +256,30 @@ export default function Game() {
     }
   }
 
-  // Play random Asriel voice audio
-  const playRandomAsrielTalk = () => {
-    const randomIndex = Math.floor(Math.random() * asrielTalkAudios.length)
-    const audio = asrielTalkRefs.current[randomIndex]
-    if (audio) {
-      audio.currentTime = 0
-      audio.play().catch(e => console.log("Asriel talk audio play error:", e))
-    }
-  }
-
-  // Clear all timers function
   const clearAllTimers = () => {
-    clearTimeout(attackCycleRef.current)
-    clearTimeout(specialAttackCycleRef.current)
-    clearTimeout(waveChangeRef.current)
-    clearTimeout(rainbowZoneTimeoutRef.current)
-    clearTimeout(flameAttackTimeoutRef.current)
-    clearInterval(countdownIntervalRef.current)
-    clearInterval(midAttackMoveIntervalRef.current)
-    clearInterval(rainbowZoneCountdownRef.current)
-    clearInterval(zoneCountdownIntervalRef.current)
-  }
-
-  // Start cycling Asriel dialogues
-  const startAsrielDialogueCycle = () => {
-    const dialogueInterval = 5000
+    if (attackCycleRef.current) clearTimeout(attackCycleRef.current)
+    if (specialAttackCycleRef.current) clearTimeout(specialAttackCycleRef.current)
+    if (waveChangeRef.current) clearTimeout(waveChangeRef.current)
+    if (rainbowZoneTimeoutRef.current) clearTimeout(rainbowZoneTimeoutRef.current)
+    if (flameAttackTimeoutRef.current) clearTimeout(flameAttackTimeoutRef.current)
     
-    let dialogueIndex = 0
-    setCurrentAsrielLine(asrielLines[dialogueIndex])
-    playRandomAsrielTalk()
-    
-    asrielDialogueIntervalRef.current = setInterval(() => {
-      if (gameState === "fight") {
-        dialogueIndex = (dialogueIndex + 1) % asrielLines.length
-        setCurrentAsrielLine(asrielLines[dialogueIndex])
-        playRandomAsrielTalk()
-      }
-    }, dialogueInterval)
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current)
+    if (midAttackMoveIntervalRef.current) clearInterval(midAttackMoveIntervalRef.current)
+    if (rainbowZoneCountdownRef.current) clearInterval(rainbowZoneCountdownRef.current)
+    if (zoneCountdownIntervalRef.current) clearInterval(zoneCountdownIntervalRef.current)
   }
 
-  // Start Asriel horizontal AND vertical movement
-  const startAsrielMovement = () => {
-    asrielMoveIntervalRef.current = setInterval(() => {
-      setAsrielOffsetX(prev => {
-        let newOffset = prev + (asrielDirectionXRef.current * 1.2)
-        if (newOffset >= 35) {
-          asrielDirectionXRef.current = -1
-          newOffset = 35
-        } else if (newOffset <= -35) {
-          asrielDirectionXRef.current = 1
-          newOffset = -35
-        }
-        return newOffset
-      })
-      
-      setAsrielOffsetY(prev => {
-        let newOffset = prev + (asrielDirectionYRef.current * 0.8)
-        if (newOffset >= 20) {
-          asrielDirectionYRef.current = -1
-          newOffset = 20
-        } else if (newOffset <= -20) {
-          asrielDirectionYRef.current = 1
-          newOffset = -20
-        }
-        return newOffset
-      })
-    }, 30)
-  }
-
-  // Return to menu after OST ends
   const returnToMenu = () => {
+    if (ostEndedRef.current) return
+    ostEndedRef.current = true
+    
+    clearAllTimers()
+    
     if (ostRef.current) {
       ostRef.current.pause()
       ostRef.current.currentTime = 0
     }
+    
     setGameState("menu")
     setPosition({ x: 128, y: 128 })
     setVisibleFlames([])
@@ -394,63 +288,33 @@ export default function Game() {
     setFlameCycleCount(0)
     setIsSecondCycle(false)
     setCurrentFlameWave(0)
+    setAttackPhase("transition")
   }
 
-  // Update flames
   const updateFlames = (flames) => {
     const waveType = flameWaveTypes[currentFlameWave]
-    return flames.map((flame) => {
-      let newX = flame.x
-      let newY = flame.y
-
-      if (waveType === "circle_spiral" && flame.isExpanding) {
-        if (flame.currentRadius < flame.maxRadius) {
-          flame.currentRadius += flame.speed
-          const centerX = GAME_CONFIG.BOX_SIZE / 2
-          const centerY = GAME_CONFIG.BOX_SIZE / 2
-          newX = centerX + Math.cos(flame.angle) * flame.currentRadius - GAME_CONFIG.FLAME_SIZE / 2
-          newY = centerY + Math.sin(flame.angle) * flame.currentRadius - GAME_CONFIG.FLAME_SIZE / 2
-        } else {
-          newX = flame.x + flame.dx
-          newY = flame.y + flame.dy
-        }
-      }
-      else if (waveType === "circle_burst" && flame.isBurst) {
-        newX = flame.x + flame.dx
-        newY = flame.y + flame.dy
-      }
-      else {
-        newX = flame.x + flame.dx
-        newY = flame.y + flame.dy
-      }
-
-      if (newX > GAME_CONFIG.BOX_SIZE + 100) newX = -100 - GAME_CONFIG.FLAME_SIZE
-      if (newX < -100 - GAME_CONFIG.FLAME_SIZE) newX = GAME_CONFIG.BOX_SIZE + 100
-      if (newY > GAME_CONFIG.BOX_SIZE + 100) newY = -100 - GAME_CONFIG.FLAME_SIZE
-      if (newY < -100 - GAME_CONFIG.FLAME_SIZE) newY = GAME_CONFIG.BOX_SIZE + 100
-
-      return { ...flame, x: newX, y: newY }
-    })
+    return flames.map((flame) => moveAttackProjectile(flame, waveType))
   }
 
-  // Activate rainbow zone for special attack
   const activateRainbowZoneForSpecial = () => {
+    if (zoneCountdownIntervalRef.current) {
+      clearInterval(zoneCountdownIntervalRef.current)
+    }
+    if (rainbowZoneTimeoutRef.current) {
+      clearTimeout(rainbowZoneTimeoutRef.current)
+    }
+    
     setRainbowZoneOnRight(Math.random() > 0.5)
     setZoneActive(true)
     setRainbowZoneDeadly(false)
     setIsZoneWarning(true)
     setZoneCountdown(3)
     setZoneCountdownDisplay(3)
-    setShowWarningAsriel(true)
     
     if (dangerRef.current) {
       dangerRef.current.currentTime = 0
       dangerRef.current.play().catch((e) => console.log("Audio play error:", e))
     }
-    
-    warningAsrielTimeoutRef.current = setTimeout(() => {
-      setShowWarningAsriel(false)
-    }, 2000)
     
     let countdownValue = 3
     zoneCountdownIntervalRef.current = setInterval(() => {
@@ -466,14 +330,11 @@ export default function Game() {
     }, 1000)
     
     rainbowZoneTimeoutRef.current = setTimeout(() => {
-      clearInterval(zoneCountdownIntervalRef.current)
+      if (zoneCountdownIntervalRef.current) {
+        clearInterval(zoneCountdownIntervalRef.current)
+      }
       setIsZoneWarning(false)
       setRainbowZoneDeadly(true)
-      setShowAngryAsriel(true)
-      
-      angryAsrielTimeoutRef.current = setTimeout(() => {
-        setShowAngryAsriel(false)
-      }, GAME_CONFIG.ASRIEL_ANGRY_DURATION)
       
       if (attackRef.current) {
         attackRef.current.currentTime = 0
@@ -481,209 +342,203 @@ export default function Game() {
       }
     }, GAME_CONFIG.DANGER_ZONE_WARNING_DURATION)
     
+    const fullDuration = GAME_CONFIG.DANGER_ZONE_WARNING_DURATION + GAME_CONFIG.DANGER_ZONE_ACTIVE_DURATION
     setTimeout(() => {
-      setZoneActive(false)
-      setRainbowZoneDeadly(false)
-      setIsZoneWarning(true)
-      clearInterval(zoneCountdownIntervalRef.current)
-      clearTimeout(rainbowZoneTimeoutRef.current)
-    }, GAME_CONFIG.DANGER_ZONE_WARNING_DURATION + GAME_CONFIG.DANGER_ZONE_ACTIVE_DURATION)
+      if (gameState === "fight") {
+        setZoneActive(false)
+        setRainbowZoneDeadly(false)
+        setIsZoneWarning(true)
+      }
+      if (zoneCountdownIntervalRef.current) {
+        clearInterval(zoneCountdownIntervalRef.current)
+      }
+      if (rainbowZoneTimeoutRef.current) {
+        clearTimeout(rainbowZoneTimeoutRef.current)
+      }
+    }, fullDuration)
   }
 
-  // Activate mid attack for special attack
   const activateMidAttackForSpecial = () => {
-    const fromRight = Math.random() > 0.5
-    setCurrentMidImage(getRandomMidImage())
+    if (midAttackMoveIntervalRef.current) {
+      clearInterval(midAttackMoveIntervalRef.current)
+    }
+    
+    const startPos = midAttackConfig.getRandomStart()
     setMidAttack({
       active: true,
-      x: fromRight ? GAME_CONFIG.BOX_SIZE : -GAME_CONFIG.MID_ATTACK_WIDTH,
-      y: Math.random() * (GAME_CONFIG.BOX_SIZE - GAME_CONFIG.MID_ATTACK_HEIGHT),
-      speed: 2.0,
-      direction: fromRight ? -1 : 1,
+      x: startPos.x,
+      y: startPos.y,
+      speed: midAttackConfig.speed,
+      direction: startPos.direction,
     })
     
     midAttackMoveIntervalRef.current = setInterval(() => {
       setMidAttack(prev => {
-        if (!prev.active) {
-          clearInterval(midAttackMoveIntervalRef.current)
-          return prev
-        }
-        let newDirection = prev.direction
-        let newX = prev.x + prev.speed * prev.direction
-        
-        if (newX > GAME_CONFIG.BOX_SIZE) {
-          newDirection = -1
-          newX = GAME_CONFIG.BOX_SIZE
-        } else if (newX < -GAME_CONFIG.MID_ATTACK_WIDTH) {
-          newDirection = 1
-          newX = -GAME_CONFIG.MID_ATTACK_WIDTH
-        }
-        
-        return { ...prev, x: newX, direction: newDirection }
+        if (!prev.active) return prev
+        return moveMidAttack(prev)
       })
     }, 16)
     
-    setTimeout(() => {
-      clearInterval(midAttackMoveIntervalRef.current)
+    const cleanupTimeout = setTimeout(() => {
+      if (midAttackMoveIntervalRef.current) {
+        clearInterval(midAttackMoveIntervalRef.current)
+        midAttackMoveIntervalRef.current = null
+      }
+      setMidAttack(prev => ({ ...prev, active: false }))
     }, GAME_CONFIG.SPECIAL_ATTACK_DURATION)
+    
+    return cleanupTimeout
   }
 
-  // Start special attack cycle
   const startSpecialAttackCycle = () => {
     clearAllTimers()
     setAttackPhase("special")
     setVisibleFlames([])
-    setAttackCountdown(GAME_CONFIG.SPECIAL_ATTACK_DURATION / 1000)
     
     activateRainbowZoneForSpecial()
-    activateMidAttackForSpecial()
+    const midCleanup = activateMidAttackForSpecial()
     
     specialAttackCycleRef.current = setTimeout(() => {
       setZoneActive(false)
       setRainbowZoneDeadly(false)
       setIsZoneWarning(true)
       setMidAttack(prev => ({ ...prev, active: false }))
-      setShowAngryAsriel(false)
-      setShowWarningAsriel(false)
-      clearInterval(midAttackMoveIntervalRef.current)
-      clearInterval(zoneCountdownIntervalRef.current)
-      clearTimeout(rainbowZoneTimeoutRef.current)
+      
+      if (midAttackMoveIntervalRef.current) {
+        clearInterval(midAttackMoveIntervalRef.current)
+        midAttackMoveIntervalRef.current = null
+      }
+      if (zoneCountdownIntervalRef.current) {
+        clearInterval(zoneCountdownIntervalRef.current)
+      }
+      if (rainbowZoneTimeoutRef.current) {
+        clearTimeout(rainbowZoneTimeoutRef.current)
+      }
       
       startFlameAttackCycle()
     }, GAME_CONFIG.SPECIAL_ATTACK_DURATION)
-    
-    countdownIntervalRef.current = setInterval(() => {
-      setAttackCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownIntervalRef.current)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
   }
 
-  // Change flame wave - pass inverted flag for second cycle
   const changeFlameWave = (waveIndex) => {
     if (waveIndex < flameWaveTypes.length) {
       setCurrentFlameWave(waveIndex)
-      // Pass isSecondCycle to create inverted patterns for second cycle
-      setVisibleFlames(createFlameWave(flameWaveTypes[waveIndex], isSecondCycle))
+      setVisibleFlames(createAttack(flameWaveTypes[waveIndex], isSecondCycle))
       playFlamecast()
+      
+      if (waveChangeRef.current) {
+        clearTimeout(waveChangeRef.current)
+      }
+      
       waveChangeRef.current = setTimeout(() => {
         changeFlameWave(waveIndex + 1)
       }, GAME_CONFIG.FLAME_ATTACK_DURATION / flameWaveTypes.length)
     }
   }
 
-  // Start flame attack cycle
   const startFlameAttackCycle = () => {
     clearAllTimers()
     setAttackPhase("flame")
     setCurrentFlameWave(0)
-    // Create flames with inverted flag for second cycle
-    setVisibleFlames(createFlameWave(flameWaveTypes[0], isSecondCycle))
+    setVisibleFlames(createAttack(flameWaveTypes[0], isSecondCycle))
     setMidAttack(prev => ({ ...prev, active: false }))
     setZoneActive(false)
     setRainbowZoneDeadly(false)
     setIsZoneWarning(true)
-    setAttackCountdown(GAME_CONFIG.FLAME_ATTACK_DURATION / 1000)
     
     playFlamecast()
+    
+    if (waveChangeRef.current) {
+      clearTimeout(waveChangeRef.current)
+    }
     
     waveChangeRef.current = setTimeout(() => {
       changeFlameWave(1)
     }, GAME_CONFIG.FLAME_ATTACK_DURATION / flameWaveTypes.length)
     
-    flameAttackTimeoutRef.current = setTimeout(() => {
-      setFlameCycleCount(prev => {
-        const newCount = prev + 1
-        if (newCount >= 2) {
-          // After two flame cycles (normal + inverted), go to special attack
-          setFlameCycleCount(0)
-          setIsSecondCycle(false)
-          startTransitionToSpecial()
-        } else {
-          // Second cycle - use inverted patterns and stars image
-          setIsSecondCycle(true)
-          startTransitionToFlame()
-        }
-        return newCount
-      })
-    }, GAME_CONFIG.FLAME_ATTACK_DURATION)
+    if (flameAttackTimeoutRef.current) {
+      clearTimeout(flameAttackTimeoutRef.current)
+    }
     
-    countdownIntervalRef.current = setInterval(() => {
-      setAttackCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownIntervalRef.current)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
+    flameAttackTimeoutRef.current = setTimeout(() => {
+      startTransitionToSpecial()
+    }, GAME_CONFIG.FLAME_ATTACK_DURATION)
   }
 
-  // Transition to next flame attack
   const startTransitionToFlame = () => {
     setAttackPhase("transition")
     setVisibleFlames([])
     setMidAttack(prev => ({ ...prev, active: false }))
     setZoneActive(false)
     setRainbowZoneDeadly(false)
+    
     setTimeout(() => {
       startFlameAttackCycle()
     }, GAME_CONFIG.TRANSITION_DURATION)
   }
 
-  // Transition to special attack
   const startTransitionToSpecial = () => {
     setAttackPhase("transition")
     setVisibleFlames([])
     setMidAttack(prev => ({ ...prev, active: false }))
     setZoneActive(false)
     setRainbowZoneDeadly(false)
+    
     setTimeout(() => {
       startSpecialAttackCycle()
     }, GAME_CONFIG.TRANSITION_DURATION)
   }
 
-  // Get Asriel image
-  const getAsrielImage = () => {
-    if (showAngryAsriel) return asrielAngryGif
-    return asrielPng
-  }
-
-  // Get projectile image (flames for first cycle, stars for second)
   const getProjectileImage = () => {
-    return isSecondCycle ? starsImage : flamesImage
+    return flamesImage
   }
 
-  // Menu functions
   const startFight = () => {
+    clearAllTimers()
+
+    ostEndedRef.current = false
+    fightStartedRef.current = false
     if (deathRef.current) {
       deathRef.current.pause()
       deathRef.current.currentTime = 0
     }
-    setShowVideo(true)
+    setPosition({ x: 128, y: 128 })
+    keys.current = { w: false, a: false, s: false, d: false }
+    setVisibleFlames([])
+    setZoneActive(false)
+    setRainbowZoneDeadly(false)
+    setRainbowZoneOnRight(true)
+    setMidAttack({
+      active: false,
+      x: -GAME_CONFIG.MID_ATTACK_WIDTH,
+      y: GAME_CONFIG.BOX_SIZE / 2 - GAME_CONFIG.MID_ATTACK_HEIGHT / 2,
+      speed: 1.5,
+      direction: 1,
+    })
+    setAttackPhase("transition")
+    setCurrentFlameWave(0)
+    setFlameCycleCount(0)
+    setIsSecondCycle(false)
+    
+    startCountdown()
   }
 
   const goHome = () => {
+    clearAllTimers()
     navigate("/")
-  }
-
-  const skipVideo = () => {
-    if (videoRef.current) {
-      videoRef.current.pause()
-      videoRef.current.dispatchEvent(new Event("ended"))
-    }
   }
 
   const startCountdown = () => {
     setCountdown(3)
     setGameState("countdown")
+    
+    // Avvia l'OST esattamente quando il countdown inizia
+    if (ostRef.current) {
+      ostRef.current.currentTime = 0
+      ostRef.current.volume = 0.5
+      ostRef.current.loop = false
+      ostRef.current.play().catch(e => console.log("OST play error:", e))
+    }
   }
-
-  // EFFECTS
 
   useEffect(() => {
     if (gameState === "loading") {
@@ -708,14 +563,19 @@ export default function Game() {
     if (!ostRef.current || !deathRef.current || !dangerRef.current || !attackRef.current) return
 
     if (gameState === "fight" || gameState === "countdown") {
-      ostRef.current.volume = 0.5
-      ostRef.current.loop = false
-      ostRef.current.play().catch(() => {})
-      
       const handleOstEnd = () => {
-        returnToMenu()
+        if ((gameState === "fight" || gameState === "countdown") && !ostEndedRef.current) {
+          returnToMenu()
+        }
       }
+      
       ostRef.current.addEventListener('ended', handleOstEnd)
+      
+      // Avvia gli attacchi SOLO quando il gioco entra in "fight"
+      if (gameState === "fight" && !fightStartedRef.current) {
+        fightStartedRef.current = true
+        startFlameAttackCycle()
+      }
       
       deathRef.current.pause()
       deathRef.current.currentTime = 0
@@ -732,13 +592,20 @@ export default function Game() {
     }
 
     if (gameState === "gameover") {
+      clearAllTimers()
+
       ostRef.current.pause()
       deathRef.current.currentTime = 0
       deathRef.current.play().catch(() => {})
+
       dangerRef.current.pause()
       dangerRef.current.currentTime = 0
+
       attackRef.current.pause()
       attackRef.current.currentTime = 0
+
+      flamecastRef.current.pause()
+      flamecastRef.current.currentTime = 0
     }
 
     if (gameState === "menu" || gameState === "loading") {
@@ -750,6 +617,7 @@ export default function Game() {
       dangerRef.current.currentTime = 0
       attackRef.current.pause()
       attackRef.current.currentTime = 0
+      fightStartedRef.current = false
     }
   }, [gameState])
 
@@ -800,14 +668,14 @@ export default function Game() {
         })
       }
 
-      if (rainbowZoneDeadly) {
+      if (rainbowZoneDeadly && gameState === "fight") {
         const inRainbowZone = rainbowZoneOnRight ? position.x > GAME_CONFIG.BOX_SIZE / 2 : position.x < GAME_CONFIG.BOX_SIZE / 2
         if (inRainbowZone) {
           setGameState("gameover")
         }
       }
 
-      if (midAttack.active) {
+      if (midAttack.active && gameState === "fight") {
         if (
           midAttack.x < position.x + GAME_CONFIG.HEART_SIZE &&
           midAttack.x + GAME_CONFIG.MID_ATTACK_WIDTH > position.x &&
@@ -826,163 +694,24 @@ export default function Game() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
       window.removeEventListener("keyup", handleKeyUp)
-      clearInterval(intervalRef.current)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
     }
   }, [gameState, position, rainbowZoneDeadly, rainbowZoneOnRight, midAttack.active, attackPhase])
 
-  useEffect(() => {
-    if (gameState === "fight") {
-      setShowAsrielDialogue(true)
-      setFlameCycleCount(0)
-      setIsSecondCycle(false)
-      setAsrielOffsetX(0)
-      setAsrielOffsetY(0)
-      asrielDirectionXRef.current = 1
-      asrielDirectionYRef.current = 1
-      startFlameAttackCycle()
-      startAsrielDialogueCycle()
-      startAsrielMovement()
-    }
-    return () => {
-      clearAllTimers()
-      clearInterval(midAttackMoveIntervalRef.current)
-      clearInterval(asrielDialogueIntervalRef.current)
-      clearInterval(asrielMoveIntervalRef.current)
-    }
-  }, [gameState])
-
-  useEffect(() => {
-    if (!showVideo) return
-    const video = videoRef.current
-    if (!video) return
-
-    let fadeOutStarted = false
-    const titleElement = document.querySelector(`.${styles.videoTitle}`)
-
-    const handleTimeUpdate = () => {
-      if (video.currentTime >= 19.0 && !fadeOutStarted) {
-        fadeOutStarted = true
-        if (titleElement) {
-          titleElement.style.transition = 'opacity 1s ease-out'
-          titleElement.style.opacity = '0'
-        }
-      }
-    }
-
-    const handleVideoEnd = () => {
-      setShowVideo(false)
-      setPosition({ x: 128, y: 128 })
-      keys.current = { w: false, a: false, s: false, d: false }
-      setVisibleFlames([])
-      setZoneActive(false)
-      setRainbowZoneDeadly(false)
-      setRainbowZoneOnRight(true)
-      setShowAngryAsriel(false)
-      setShowWarningAsriel(false)
-      setMidAttack({
-        active: false,
-        x: -GAME_CONFIG.MID_ATTACK_WIDTH,
-        y: GAME_CONFIG.BOX_SIZE / 2 - GAME_CONFIG.MID_ATTACK_HEIGHT / 2,
-        speed: 1.5,
-        direction: 1,
-      })
-      setAttackPhase("transition")
-      setCurrentFlameWave(0)
-      setFlameCycleCount(0)
-      setIsSecondCycle(false)
-      if (ostRef.current) {
-        ostRef.current.currentTime = 0
-      }
-      startCountdown()
-    }
-
-    video.addEventListener("timeupdate", handleTimeUpdate)
-    video.addEventListener("ended", handleVideoEnd)
-
-    const playVideo = async () => {
-      try {
-        video.volume = 0.2
-        video.preload = "auto"
-        await video.play()
-      } catch (err) {
-        console.error("Video play failed:", err)
-        video.muted = true
-        try {
-          await video.play()
-        } catch (mutedErr) {
-          console.error("Muted video play failed:", mutedErr)
-          handleVideoEnd()
-        }
-      }
-    }
-
-    playVideo()
-
-    return () => {
-      video.removeEventListener("timeupdate", handleTimeUpdate)
-      video.removeEventListener("ended", handleVideoEnd)
-      if (titleElement) {
-        titleElement.style.transition = ''
-        titleElement.style.opacity = ''
-      }
-    }
-  }, [showVideo])
-
-  // MAIN RENDER
   return (
     <div className={styles.container}>
-      {/* Audio Elements */}
       <audio ref={ostRef} src={ostAudio} />
       <audio ref={deathRef} src={deathAudio} />
       <audio ref={dangerRef} src={dangerAudio} />
       <audio ref={attackRef} src={attackAudio} />
       <audio ref={flamecastRef} src={flamecastAudio} />
-      <audio ref={victoryAudioRef} src={victoryAudio} />
-      
-      {/* Asriel Talk Audio Elements */}
-      <audio ref={el => asrielTalkRefs.current[0] = el} src={asrielTalk1} />
-      <audio ref={el => asrielTalkRefs.current[1] = el} src={asrielTalk2} />
-      <audio ref={el => asrielTalkRefs.current[2] = el} src={asrielTalk3} />
 
-      {/* Intro Video */}
-      {showVideo && (
-        <div className={styles.videoContainer}>
-          <video
-            ref={videoRef}
-            src={startVideo}
-            className={styles.videoPlayer}
-            autoPlay
-            playsInline
-            webkit-playsinline="true"
-            preload="auto"
-            controlsList="nodownload"
-            disablePictureInPicture
-            onContextMenu={(e) => e.preventDefault()}
-          />
-          <button onClick={skipVideo} className={styles.skipButton}>
-            Skip
-          </button>
-        </div>
-      )}
-
-      {/* Loading Screen */}
       {gameState === "loading" && <div className={styles.countdownText} style={{ userSelect: "none" }}></div>}
 
-      {/* Menu and Game Over */}
-      {(gameState === "menu" || gameState === "gameover") && !showVideo && (
+      {(gameState === "menu" || gameState === "gameover") && (
         <div className={gameState === "menu" ? styles.menu : styles.retryMenu}>
-          {gameState === "menu" && (
-            <img 
-              src={startImage} 
-              alt="Start" 
-              className={styles.startImage}
-            />
-          )}
-          {gameState === "gameover" && (
-            <>
-              <div className={styles.retryText}>You can't give up now...</div>
-            </>
-          )}
           <div className={styles.menuButtons}>
             <button onClick={startFight} className={styles.menuButton}>
               Determination
@@ -994,42 +723,17 @@ export default function Game() {
         </div>
       )}
 
-      {/* Fight Screen */}
-      {(gameState === "fight" || gameState === "countdown") && !showVideo && (
+      {(gameState === "fight" || gameState === "countdown") && (
         <div className={styles.gameWrapper}>
           <div className={styles.verticalLayout}>
-            {/* Asriel Image */}
-            <div 
-              className={styles.asrielContainer}
-              style={{ transform: `translateX(${asrielOffsetX}px) translateY(${asrielOffsetY}px)` }}
-            >
+            <div className={styles.asrielContainer}>
               <img 
-                src={getAsrielImage()} 
+                src={rainbowZoneDeadly ? asrielAngryGif : asrielPng} 
                 alt="Asriel" 
-                className={showAngryAsriel ? styles.asrielAngry : styles.asriel}
+                className={styles.asriel} 
               />
             </div>
-            
-            {/* Dialogue Box */}
-            {showAsrielDialogue && (
-              <div className={styles.asrielDialogue}>
-                <span className={styles.asrielName}>ASRIEL DREEMURR:</span>
-                <span className={styles.dialogueText}>"{currentAsrielLine}"</span>
-              </div>
-            )}
-            
-            {/* Attack Name Display */}
-            <div className={styles.attackNameDisplay}>
-              {attackPhase === "flame" ? (
-                <span className={styles.flameAttackName}>{isSecondCycle ? "STARS" : "FLAMES"}</span>
-              ) : attackPhase === "special" ? (
-                <span className={styles.specialAttackName}>SPECIAL ATTACK</span>
-              ) : (
-                <span className={styles.transitionAttackName}>NEXT ATTACK</span>
-              )}
-            </div>
-            
-            {/* Arena Box */}
+
             <div className={styles.box}>
               {zoneActive && (
                 <>
@@ -1076,7 +780,7 @@ export default function Game() {
 
               {attackPhase === "special" && midAttack.active && (
                 <img
-                  src={currentMidImage}
+                  src={midImage}
                   alt="Mid Attack"
                   className={styles.midAttack}
                   style={{
@@ -1092,6 +796,23 @@ export default function Game() {
               {gameState === "countdown" && (
                 <div className={styles.countdownText}>{countdown === 0 ? "" : countdown}</div>
               )}
+            </div>
+
+            {/* STATS BAR - Come in Undertale */}
+            <div className={styles.statsBar}>
+              <div className={styles.statsLeft}>
+                <span className={styles.statText}>YOU</span>
+                <span className={styles.statValue}>LV 1</span>
+              </div>
+              <div className={styles.statsRight}>
+                <span className={styles.statText}>PS</span>
+                <div className={styles.hpBarContainer}>
+                  <div className={styles.hpBarRed}>
+                    <div className={styles.hpBarYellow}></div>
+                  </div>
+                  <span className={styles.hpText}>1/20</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

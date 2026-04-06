@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tornado Pixel Art - Rainbow Pastel</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    opacity: 50%;
+  }
+</style>
+</head>
+<body>
+<canvas id="tornado"></canvas>
+
+<script>
+const canvas = document.getElementById("tornado");
+const ctx = canvas.getContext("2d");
+
+let width, height;
+
+function resize() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+}
+
+window.addEventListener("resize", resize);
+resize();
+
+// colonne
+const columnWidth = 12;
+const columnGap = 30;
+const segmentHeight = 16;
+
+// lentissimo
+const speed = 0.00005;
+
+function pastelRainbow(t) {
+  const hue = (t * 360) % 360;
+  return `hsl(${hue}, 60%, 80%)`;
+}
+
+let time = 0;
+
+function draw() {
+  ctx.clearRect(0, 0, width, height);
+
+  const totalWidth = columnWidth + columnGap;
+  const columns = Math.ceil(width / totalWidth) + 4;
+
+  // dividi viewport in 3
+  const leftLimit = width / 3;
+  const rightLimit = (width / 3) * 2;
+
+  for (let i = 0; i < columns; i++) {
+    const baseX = i * totalWidth;
+
+    // salta la zona centrale
+    if (baseX > leftLimit && baseX < rightLimit) continue;
+
+    for (let y = 0; y < height; y += segmentHeight) {
+      const t = (y / height + time * 0.03) % 1;
+
+      // tornado lentissimo
+      const wave = Math.sin(time * 0.2 + i * 0.5 + y * 0.004) * 30;
+      const offset = Math.sin(time * 0.15 + i * 0.3) * 15;
+
+      const x = baseX + wave + offset;
+
+      ctx.fillStyle = pastelRainbow(t);
+
+      // colonne spezzate
+      if (Math.sin(i * 0.6 + y * 0.07 + time * 0.5) > 0.25) {
+        ctx.fillRect(x, y, columnWidth, segmentHeight - 3);
+      }
+    }
+  }
+
+  time += speed * height;
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+</body>
+</html>
