@@ -2,8 +2,17 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Contacts.module.css";
 import githubLogo from "../../assets/Logos/GithubLogo.svg";
-import linkedinLogo from "../../assets/Logos/linkedinLogo.svg"; 
+import linkedinLogo from "../../assets/Logos/linkedinLogo.svg";
 import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
+
+// Import delle 7 immagini (1 centrale + 6 orbitanti)
+import imgContact1 from "../../assets/contact/ImgContact1.jpg";
+import imgContact2 from "../../assets/contact/ImgContact2.jpg";
+import imgContact3 from "../../assets/contact/ImgContact3.jpg";
+import imgContact4 from "../../assets/contact/ImgContact4.jpg";
+import imgContact5 from "../../assets/contact/ImgContact5.jpg";
+import imgContact6 from "../../assets/contact/ImgContact6.jpg";
+import imgContact7 from "../../assets/contact/ImgContact7.jpg";
 
 const contactTexts = {
   subtitle: "Disponibile per nuove opportunità",
@@ -19,8 +28,6 @@ const contactTexts = {
 };
 
 export default function Contacts() {
-  const navigate = useNavigate();
-
   const handleGoToGitHub = () => {
     window.open(contactTexts.githubUrl, "_blank");
   };
@@ -33,12 +40,64 @@ export default function Contacts() {
     <section className={styles.contactSection}>
       <div className={styles.content}>
         <div className={styles.profileContainer}>
-          <div className={styles.profileImageWrapper}>
-            <img 
-              src="profile.jpg" 
-              alt="Profile" 
-              className={styles.profileImage}
-            />
+          <div className={styles.planetsContainer}>
+            {/* Pianeta centrale - contact 1 grande */}
+            <div className={styles.centerPlanet}>
+              <img 
+                src={imgContact1} 
+                alt="Contact 1" 
+                className={styles.centerImage}
+              />
+            </div>
+            
+            {/* 6 pianeti orbitanti */}
+            <div className={`${styles.orbitingPlanet} ${styles.planet2}`}>
+              <img 
+                src={imgContact2} 
+                alt="Contact 2" 
+                className={styles.planetImage}
+              />
+            </div>
+            
+            <div className={`${styles.orbitingPlanet} ${styles.planet3}`}>
+              <img 
+                src={imgContact3} 
+                alt="Contact 3" 
+                className={styles.planetImage}
+              />
+            </div>
+            
+            <div className={`${styles.orbitingPlanet} ${styles.planet4}`}>
+              <img 
+                src={imgContact4} 
+                alt="Contact 4" 
+                className={styles.planetImage}
+              />
+            </div>
+            
+            <div className={`${styles.orbitingPlanet} ${styles.planet5}`}>
+              <img 
+                src={imgContact5} 
+                alt="Contact 5" 
+                className={styles.planetImage}
+              />
+            </div>
+            
+            <div className={`${styles.orbitingPlanet} ${styles.planet6}`}>
+              <img 
+                src={imgContact6} 
+                alt="Contact 6" 
+                className={styles.planetImage}
+              />
+            </div>
+            
+            <div className={`${styles.orbitingPlanet} ${styles.planet7}`}>
+              <img 
+                src={imgContact7} 
+                alt="Contact 7" 
+                className={styles.planetImage}
+              />
+            </div>
           </div>
         </div>
 

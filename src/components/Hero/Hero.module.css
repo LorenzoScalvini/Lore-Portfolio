@@ -45,8 +45,8 @@
   animation: titleAnimation 3s ease-in-out infinite;
   background: linear-gradient(
     45deg,
-    #000000 30%,
-    #a8e4a0 50%,
+    #ffffff 30%,
+    #8aca82 50%,
     #ffffff 70%
   );
   background-size: 200% auto;
@@ -97,39 +97,24 @@
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 500;
-  border: none;
+  border: 2px solid rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.3s ease;
+  background: transparent;
 }
 
 .primaryButton {
-  background: rgba(30, 30, 30, 0);
-  border: 2px solid rgba(255, 255, 255, 0.1);
   color: #a8e4a0;
-  backdrop-filter: blur(10px);
 }
 
 .secondaryButton {
-  background: rgba(30, 30, 30, 0);
   color: #a8e4a0;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
 }
 
 .button:hover {
   transform: translateY(-2px);
-}
-
-.primaryButton:hover {
   border-color: #ffffff;
-}
-
-.secondaryButton:hover {
-  border-color: #ffffff;
-}
-
-.arrow {
-  transition: transform 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .button:hover .arrow {

@@ -7,6 +7,9 @@ import deathAudio from "../../assets/game/death.mp3"
 import dangerAudio from "../../assets/game/danger.mp3"
 import attackAudio from "../../assets/game/attack.mp3"
 import flamecastAudio from "../../assets/game/flamecast.mp3"
+import asrielTalk1 from "../../assets/game/asrieltalk1.mp3"
+import asrielTalk2 from "../../assets/game/asrieltalk2.mp3"
+import asrielTalk3 from "../../assets/game/asrieltalk3.mp3"
 import asrielPng from "../../assets/game/asriel.png"
 import asrielAngryGif from "../../assets/game/asriel-angry.gif"
 import heartImage from "../../assets/game/heart.png"
@@ -152,7 +155,6 @@ const flameWaveTypes = allAttacks.map(attack => attack.name)
 const createAttack = (attackName, isInverted = false) => {
   const attack = allAttacks.find(a => a.name === attackName)
   if (!attack) return []
-  
   return isInverted ? attack.getInverted() : attack.getForward()
 }
 
@@ -202,6 +204,7 @@ const moveMidAttack = (midAttack) => {
 
 export default function Game() {
   const navigate = useNavigate()
+  const canvasRef = useRef(null)
 
   const [gameState, setGameState] = useState("loading")
   const [position, setPosition] = useState({ x: 128, y: 128 })
@@ -229,7 +232,6 @@ export default function Game() {
     direction: 1,
   })
 
-  // Stato per i cloni arcobaleno di Asriel
   const [rainbowClones] = useState(() => {
     const colors = ['#ff0000', '#ff7700', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#8b00ff']
     return colors.map((color, index) => ({
@@ -254,6 +256,20 @@ export default function Game() {
   const zoneCountdownIntervalRef = useRef(null)
   const ostEndedRef = useRef(false)
   const fightStartedRef = useRef(false)
+  const animationRef = useRef(null)
+
+  const ASRIEL_DIALOGUES = [
+    "You'll never be able to stop me.",
+    "Is this really the best you can do?",
+    "I have the power of every soul...",
+    "Don't make me laugh.",
+    "GIVE UP. It's already over.",
+  ]
+  const [dialogueIndex, setDialogueIndex] = useState(0)
+  const dialogueIntervalRef = useRef(null)
+  const asrielTalk1Ref = useRef(null)
+  const asrielTalk2Ref = useRef(null)
+  const asrielTalk3Ref = useRef(null)
 
   const ostRef = useRef(null)
   const deathRef = useRef(null)
@@ -267,6 +283,99 @@ export default function Game() {
       flamecastRef.current.play().catch(e => console.log("Flamecast audio play error:", e))
     }
   }
+
+  const playAsrielTalk = () => {
+    const refs = [asrielTalk1Ref, asrielTalk2Ref, asrielTalk3Ref]
+    const chosen = refs[Math.floor(Math.random() * refs.length)]
+    if (chosen.current) {
+      chosen.current.currentTime = 0
+      chosen.current.play().catch(e => console.log("AsrielTalk audio play error:", e))
+    }
+  }
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    let width, height
+    let time = 0
+    const columnWidth = 12
+    const columnGap = 30
+    const segmentHeight = 16
+    const speed = 0.00005
+
+    const pastelRainbow = (t) => {
+      const hue = (t * 360) % 360
+      return `hsl(${hue}, 60%, 80%)`
+    }
+
+    const resize = () => {
+      width = canvas.width = window.innerWidth
+      height = canvas.height = window.innerHeight
+    }
+
+    resize()
+    window.addEventListener("resize", resize)
+
+    const draw = () => {
+      if (!ctx) return
+      ctx.clearRect(0, 0, width, height)
+
+      const totalWidth = columnWidth + columnGap
+      const columns = Math.ceil(width / totalWidth) + 4
+      const leftLimit = width / 3
+      const rightLimit = (width / 3) * 2
+
+      for (let i = 0; i < columns; i++) {
+        const baseX = i * totalWidth
+        if (baseX > leftLimit && baseX < rightLimit) continue
+
+        for (let y = 0; y < height; y += segmentHeight) {
+          const t = (y / height + time * 0.03) % 1
+          const wave = Math.sin(time * 0.2 + i * 0.5 + y * 0.004) * 30
+          const offset = Math.sin(time * 0.15 + i * 0.3) * 15
+          const x = baseX + wave + offset
+
+          ctx.fillStyle = pastelRainbow(t)
+
+          if (Math.sin(i * 0.6 + y * 0.07 + time * 0.5) > 0.25) {
+            ctx.fillRect(x, y, columnWidth, segmentHeight - 3)
+          }
+        }
+      }
+
+      time += speed * height
+      animationRef.current = requestAnimationFrame(draw)
+    }
+
+    draw()
+
+    return () => {
+      window.removeEventListener("resize", resize)
+      if (animationRef.current) cancelAnimationFrame(animationRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (gameState !== "fight") {
+      if (dialogueIntervalRef.current) clearInterval(dialogueIntervalRef.current)
+      return
+    }
+    const firstAudioDelay = setTimeout(() => {
+      playAsrielTalk()
+    }, 150)
+    dialogueIntervalRef.current = setInterval(() => {
+      setDialogueIndex(prev => {
+        const next = (prev + 1) % ASRIEL_DIALOGUES.length
+        playAsrielTalk()
+        return next
+      })
+    }, 7000)
+    return () => {
+      clearTimeout(firstAudioDelay)
+      if (dialogueIntervalRef.current) clearInterval(dialogueIntervalRef.current)
+    }
+  }, [gameState])
 
   const clearAllTimers = () => {
     if (attackCycleRef.current) clearTimeout(attackCycleRef.current)
@@ -712,11 +821,16 @@ export default function Game() {
 
   return (
     <div className={styles.container}>
+      <canvas ref={canvasRef} id="tornadoCanvas" className={styles.tornadoCanvas}></canvas>
+      
       <audio ref={ostRef} src={ostAudio} />
       <audio ref={deathRef} src={deathAudio} />
       <audio ref={dangerRef} src={dangerAudio} />
       <audio ref={attackRef} src={attackAudio} />
       <audio ref={flamecastRef} src={flamecastAudio} />
+      <audio ref={asrielTalk1Ref} src={asrielTalk1} />
+      <audio ref={asrielTalk2Ref} src={asrielTalk2} />
+      <audio ref={asrielTalk3Ref} src={asrielTalk3} />
 
       {gameState === "loading" && <div className={styles.countdownText} style={{ userSelect: "none" }}></div>}
 
@@ -738,10 +852,8 @@ export default function Game() {
           <div className={styles.verticalLayout}>
             <div className={styles.asrielContainer}>
               <div className={styles.asrielWrapper}>
-                {/* Aura arcobaleno */}
                 <div className={styles.rainbowAura}></div>
                 
-                {/* Cloni arcobaleno */}
                 {rainbowClones.map((clone) => (
                   <img
                     key={clone.id}
@@ -758,7 +870,6 @@ export default function Game() {
                   />
                 ))}
                 
-                {/* Asriel originale */}
                 <img 
                   src={rainbowZoneDeadly ? asrielAngryGif : asrielPng} 
                   alt="Asriel" 
@@ -766,6 +877,11 @@ export default function Game() {
                   draggable={false}
                 />
               </div>
+            </div>
+
+            <div className={styles.dialogueBox}>
+              <span className={styles.dialogueGhost}>GIVE UP. It&apos;s already over.</span>
+              <span className={styles.dialogueText}>{ASRIEL_DIALOGUES[dialogueIndex]}</span>
             </div>
 
             <div className={styles.box}>
@@ -832,7 +948,6 @@ export default function Game() {
               )}
             </div>
 
-            {/* STATS BAR - Come in Undertale */}
             <div className={styles.statsBar}>
               <div className={styles.statsLeft}>
                 <span className={styles.statText}>YOU</span>

@@ -23,22 +23,135 @@
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 550px;
 }
 
-.profileImageWrapper {
-  width: 300px;
-  height: 300px;
+.planetsContainer {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Pianeta centrale - grande */
+.centerPlanet {
+  position: absolute;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid rgba(168, 228, 160, 0.5);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  animation: float 6s ease-in-out infinite;
+  z-index: 10;
 }
 
-.profileImage {
+.centerImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Pianeti orbitanti - circolari senza glow */
+.orbitingPlanet {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.orbitingPlanet:hover {
+  transform: scale(1.1);
+  z-index: 20;
+}
+
+.planetImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Orbite e animazioni per 6 pianeti */
+.planet2 {
+  animation: orbit2 12s linear infinite;
+}
+
+.planet3 {
+  animation: orbit3 15s linear infinite;
+}
+
+.planet4 {
+  animation: orbit4 18s linear infinite;
+}
+
+.planet5 {
+  animation: orbit5 20s linear infinite;
+}
+
+.planet6 {
+  animation: orbit6 14s linear infinite;
+}
+
+.planet7 {
+  animation: orbit7 17s linear infinite;
+}
+
+/* Orbite con diverse distanze e punti di partenza */
+@keyframes orbit2 {
+  0% {
+    transform: rotate(0deg) translateX(180px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(180px) rotate(-360deg);
+  }
+}
+
+@keyframes orbit3 {
+  0% {
+    transform: rotate(60deg) translateX(200px) rotate(-60deg);
+  }
+  100% {
+    transform: rotate(420deg) translateX(200px) rotate(-420deg);
+  }
+}
+
+@keyframes orbit4 {
+  0% {
+    transform: rotate(120deg) translateX(170px) rotate(-120deg);
+  }
+  100% {
+    transform: rotate(480deg) translateX(170px) rotate(-480deg);
+  }
+}
+
+@keyframes orbit5 {
+  0% {
+    transform: rotate(180deg) translateX(210px) rotate(-180deg);
+  }
+  100% {
+    transform: rotate(540deg) translateX(210px) rotate(-540deg);
+  }
+}
+
+@keyframes orbit6 {
+  0% {
+    transform: rotate(240deg) translateX(190px) rotate(-240deg);
+  }
+  100% {
+    transform: rotate(600deg) translateX(190px) rotate(-600deg);
+  }
+}
+
+@keyframes orbit7 {
+  0% {
+    transform: rotate(300deg) translateX(175px) rotate(-300deg);
+  }
+  100% {
+    transform: rotate(660deg) translateX(175px) rotate(-660deg);
+  }
 }
 
 .textContent {
@@ -158,30 +271,10 @@
   border-color: #ffffff;
 }
 
-.arrow {
-  transition: transform 0.3s ease;
-}
-
-.button:hover .arrow {
-  transform: translateX(5px);
-}
-
 .icon {
   width: 36px;
   height: 36px;
   vertical-align: middle;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
 }
 
 @keyframes slideIn {
@@ -206,9 +299,7 @@
   }
 }
 
-@media (max-width: 1200px) {
-}
-
+/* Media Queries per responsive */
 @media (max-width: 992px) {
   .contactSection {
     padding: 6rem 1rem;
@@ -223,15 +314,100 @@
     text-align: center;
   }
 
-  .profileImageWrapper {
-    width: 250px;
-    height: 250px;
+  .planetsContainer {
+    width: 420px;
+    height: 420px;
+  }
+
+  .centerPlanet {
+    width: 170px;
+    height: 170px;
+  }
+
+  .orbitingPlanet {
+    width: 70px;
+    height: 70px;
+  }
+
+  @keyframes orbit2 {
+    0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+  }
+
+  @keyframes orbit3 {
+    0% { transform: rotate(60deg) translateX(165px) rotate(-60deg); }
+    100% { transform: rotate(420deg) translateX(165px) rotate(-420deg); }
+  }
+
+  @keyframes orbit4 {
+    0% { transform: rotate(120deg) translateX(140px) rotate(-120deg); }
+    100% { transform: rotate(480deg) translateX(140px) rotate(-480deg); }
+  }
+
+  @keyframes orbit5 {
+    0% { transform: rotate(180deg) translateX(175px) rotate(-180deg); }
+    100% { transform: rotate(540deg) translateX(175px) rotate(-540deg); }
+  }
+
+  @keyframes orbit6 {
+    0% { transform: rotate(240deg) translateX(158px) rotate(-240deg); }
+    100% { transform: rotate(600deg) translateX(158px) rotate(-600deg); }
+  }
+
+  @keyframes orbit7 {
+    0% { transform: rotate(300deg) translateX(145px) rotate(-300deg); }
+    100% { transform: rotate(660deg) translateX(145px) rotate(-660deg); }
   }
 }
 
 @media (max-width: 768px) {
   .actionButtons {
     justify-content: center;
+  }
+
+  .planetsContainer {
+    width: 360px;
+    height: 360px;
+  }
+
+  .centerPlanet {
+    width: 150px;
+    height: 150px;
+  }
+
+  .orbitingPlanet {
+    width: 60px;
+    height: 60px;
+  }
+
+  @keyframes orbit2 {
+    0% { transform: rotate(0deg) translateX(130px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(130px) rotate(-360deg); }
+  }
+
+  @keyframes orbit3 {
+    0% { transform: rotate(60deg) translateX(145px) rotate(-60deg); }
+    100% { transform: rotate(420deg) translateX(145px) rotate(-420deg); }
+  }
+
+  @keyframes orbit4 {
+    0% { transform: rotate(120deg) translateX(120px) rotate(-120deg); }
+    100% { transform: rotate(480deg) translateX(120px) rotate(-480deg); }
+  }
+
+  @keyframes orbit5 {
+    0% { transform: rotate(180deg) translateX(152px) rotate(-180deg); }
+    100% { transform: rotate(540deg) translateX(152px) rotate(-540deg); }
+  }
+
+  @keyframes orbit6 {
+    0% { transform: rotate(240deg) translateX(138px) rotate(-240deg); }
+    100% { transform: rotate(600deg) translateX(138px) rotate(-600deg); }
+  }
+
+  @keyframes orbit7 {
+    0% { transform: rotate(300deg) translateX(125px) rotate(-300deg); }
+    100% { transform: rotate(660deg) translateX(125px) rotate(-660deg); }
   }
 }
 
@@ -242,11 +418,6 @@
 
   .description p {
     font-size: 1.1rem;
-  }
-
-  .profileImageWrapper {
-    width: 200px;
-    height: 200px;
   }
 
   .contactInfo {
@@ -260,5 +431,50 @@
   .contactIcon {
     width: 20px;
     height: 20px;
+  }
+
+  .planetsContainer {
+    width: 300px;
+    height: 300px;
+  }
+
+  .centerPlanet {
+    width: 130px;
+    height: 130px;
+  }
+
+  .orbitingPlanet {
+    width: 50px;
+    height: 50px;
+  }
+
+  @keyframes orbit2 {
+    0% { transform: rotate(0deg) translateX(110px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(110px) rotate(-360deg); }
+  }
+
+  @keyframes orbit3 {
+    0% { transform: rotate(60deg) translateX(122px) rotate(-60deg); }
+    100% { transform: rotate(420deg) translateX(122px) rotate(-420deg); }
+  }
+
+  @keyframes orbit4 {
+    0% { transform: rotate(120deg) translateX(100px) rotate(-120deg); }
+    100% { transform: rotate(480deg) translateX(100px) rotate(-480deg); }
+  }
+
+  @keyframes orbit5 {
+    0% { transform: rotate(180deg) translateX(128px) rotate(-180deg); }
+    100% { transform: rotate(540deg) translateX(128px) rotate(-540deg); }
+  }
+
+  @keyframes orbit6 {
+    0% { transform: rotate(240deg) translateX(115px) rotate(-240deg); }
+    100% { transform: rotate(600deg) translateX(115px) rotate(-600deg); }
+  }
+
+  @keyframes orbit7 {
+    0% { transform: rotate(300deg) translateX(105px) rotate(-300deg); }
+    100% { transform: rotate(660deg) translateX(105px) rotate(-660deg); }
   }
 }

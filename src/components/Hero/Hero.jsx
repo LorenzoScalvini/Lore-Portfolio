@@ -10,7 +10,6 @@ const heroTexts = {
   title: "LORENZO SCALVINI",
   description:
     "Full Stack Web Developer specializzato in React e Vanilla JS o Typescript",
-  buttonProjects: "Progetti",
   buttonAbout: "Contattami",
   buttonGithub: "Github",
   githubUrl: "https://github.com/LorenzoScalvini",
@@ -18,10 +17,6 @@ const heroTexts = {
 
 export default function Hero() {
   const navigate = useNavigate();
-
-  const handleGoToProjects = () => {
-    navigate("/projects");
-  };
 
   const handleGoToAbout = () => {
     navigate("/contacts");
@@ -44,19 +39,10 @@ export default function Hero() {
 
           <div className={styles.actionButtons}>
             <button
-              onClick={handleGoToProjects}
-              className={`${styles.button} ${styles.primaryButton}`}
-            >
-              {heroTexts.buttonProjects}
-              <span className={styles.arrow}>→</span>
-            </button>
-
-            <button
               onClick={handleGoToAbout}
               className={`${styles.button} ${styles.primaryButton}`}
             >
               {heroTexts.buttonAbout}
-              <span className={styles.arrow}>→</span>
             </button>
 
             <button

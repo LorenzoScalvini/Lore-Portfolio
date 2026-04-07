@@ -16,31 +16,15 @@
   image-rendering: pixelated;
 }
 
-.container::after {
-  content: "";
-  position: absolute;
+.tornadoCanvas {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgba(18, 16, 16, 0.1) 50%, transparent 50%),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  background-size: 100% 4px, 3px 100%;
   pointer-events: none;
-  z-index: 100;
-}
-
-.container::before {
-  content: "";
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(53, 15, 78, 0.2) 0%, rgba(0, 0, 0, 1) 70%);
   z-index: 0;
-  pointer-events: none;
+  opacity: 0.5;
 }
 
 .menu,
@@ -167,7 +151,6 @@
   height: 300px;
 }
 
-/* Aura arcobaleno */
 .rainbowAura {
   position: absolute;
   top: 50%;
@@ -207,7 +190,6 @@
   to { background-position: 200% 200%; }
 }
 
-/* Asriel originale - scatti molto lenti e lunghi */
 .asriel {
   position: absolute;
   width: 300px;
@@ -220,13 +202,11 @@
   animation: asrielLongSlowShots 6s ease-in-out infinite;
 }
 
-/* Asriel arrabbiato - STESSA VELOCITÀ (6s), solo filtro diverso */
 .asrielIntense {
   animation: asrielLongSlowShots 6s ease-in-out infinite;
   filter: drop-shadow(0 0 20px rgba(255,100,100,0.7));
 }
 
-/* Cloni arcobaleno - stessa animazione lenta */
 .asrielClone {
   position: absolute;
   width: 300px;
@@ -243,40 +223,30 @@
   transform: translate(var(--offset-x, 0px), var(--offset-y, 0px));
 }
 
-/* Cloni arrabbiati - STESSA VELOCITÀ */
 .asrielCloneIntense {
   animation: asrielLongSlowShots 6s ease-in-out infinite;
   opacity: 0.7;
 }
 
-/* MOVIMENTO: scatti MOLTO LENTI E LUNGHI
-   Ogni scatto dura circa 1.5 secondi, movimento totale 6 secondi */
 @keyframes asrielLongSlowShots {
-  /* Parte dal centro */
   0% {
     transform: translateX(0px) translateY(0px);
   }
-  /* 1° scatto LENTO: va a destra (molto largo) */
   20% {
     transform: translateX(180px) translateY(-10px);
   }
-  /* Torna lentamente al centro */
   35% {
     transform: translateX(0px) translateY(0px);
   }
-  /* 2° scatto LENTO: va a sinistra (molto largo) */
   55% {
     transform: translateX(-180px) translateY(10px);
   }
-  /* Torna lentamente al centro */
   70% {
     transform: translateX(0px) translateY(0px);
   }
-  /* 3° scatto LENTO: va a destra */
   90% {
     transform: translateX(180px) translateY(-10px);
   }
-  /* Torna al centro e rimane */
   100% {
     transform: translateX(0px) translateY(0px);
   }
@@ -289,6 +259,7 @@
   border: 8px solid white;
   overflow: hidden;
   background-color: #000;
+  z-index: 5;
 }
 
 .heart {
@@ -335,18 +306,18 @@
 }
 
 @keyframes midAttackGlow {
-  from { filter: brightness(1)   drop-shadow(0 0  8px rgba(255, 215, 0, 0.8)); }
-  to   { filter: brightness(1.3) drop-shadow(0 0 12px rgba(255, 215, 0, 1)); }
+  from { filter: brightness(1) drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)); }
+  to { filter: brightness(1.3) drop-shadow(0 0 12px rgba(255, 215, 0, 1)); }
 }
 
 @keyframes verticalFloat {
   0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes slowSpin {
   from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
 .safeZone {
@@ -357,7 +328,6 @@
   background-color: transparent;
 }
 
-/* Warning phase: azzurro trasparente */
 .warningZone {
   position: absolute;
   top: 0;
@@ -370,12 +340,11 @@
 }
 
 @keyframes warningZonePulse {
-  0%   { background: rgba(80, 180, 255, 0.12); box-shadow: inset 0 0 20px rgba(80, 180, 255, 0.1); }
-  50%  { background: rgba(80, 180, 255, 0.28); box-shadow: inset 0 0 35px rgba(120, 210, 255, 0.25); }
+  0% { background: rgba(80, 180, 255, 0.12); box-shadow: inset 0 0 20px rgba(80, 180, 255, 0.1); }
+  50% { background: rgba(80, 180, 255, 0.28); box-shadow: inset 0 0 35px rgba(120, 210, 255, 0.25); }
   100% { background: rgba(80, 180, 255, 0.12); box-shadow: inset 0 0 20px rgba(80, 180, 255, 0.1); }
 }
 
-/* Deadly phase: arcobaleno */
 .rainbowZone {
   position: absolute;
   top: 0;
@@ -390,7 +359,7 @@
 }
 
 @keyframes rainbowGradient {
-  0%   { background-position: 0% 0%; }
+  0% { background-position: 0% 0%; }
   100% { background-position: 100% 100%; }
 }
 
@@ -408,8 +377,8 @@
 }
 
 @keyframes countdownNumberPulse {
-  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-  50%  { transform: translate(-50%, -50%) scale(1.3); }
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.3); }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
@@ -427,8 +396,8 @@
 }
 
 @keyframes countdownPulse {
-  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-  50%  { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
@@ -457,12 +426,11 @@
 }
 
 @keyframes pixelPress {
-  0%   { transform: translateY(0); }
-  50%  { transform: translateY(2px); }
+  0% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
   100% { transform: translateY(0); }
 }
 
-/* STATS BAR - Stile Undertale */
 .statsBar {
   display: flex;
   justify-content: space-between;
@@ -527,4 +495,45 @@
 .hpText {
   color: #ffffff;
   font-size: 24px;
+}
+
+.dialogueBox {
+  width: 340px;
+  padding: 4px 10px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.dialogueText {
+  color: #ffffff;
+  font-family: "VT323", monospace;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  line-height: 1;
+  white-space: nowrap;
+  display: block;
+  width: 100%;
+  animation: dialogueFadeIn 0.4s ease-in;
+  image-rendering: pixelated;
+}
+
+.dialogueGhost {
+  font-family: "VT323", monospace;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  line-height: 1;
+  white-space: nowrap;
+  visibility: hidden;
+  position: absolute;
+  pointer-events: none;
+}
+
+@keyframes dialogueFadeIn {
+  0% { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
